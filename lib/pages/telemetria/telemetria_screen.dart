@@ -15,7 +15,11 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   final double headingRowHeight = 40.0;
   final TelemetriaDao _telemetriaDao = TelemetriaDao();
   bool loadData = false;
-  List<Situacoes> situacoes = [];
+  dynamic situacoesSetores = [];
+  late String cellText;
+
+  List<Map<String, String>> arrayRows = [];
+  Map<String, String> colunas = {};
 
   List<DataColumn> columns = [
     const DataColumn(
@@ -26,33 +30,16 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   ];
 
   List<DataRow> rows = [];
+
   List<DataCell> cells = [];
 
   @override
   void initState() {
     super.initState();
-
-    for (var categoria in arrayCategorias) {
-      rows.add(DataRow(
-        cells: <DataCell>[
-          DataCell(
-            CellText(text: categoria.descricao),
-          ),
-          DataCell(
-            CellText(text: '5555'),
-          ),
-          DataCell(
-            CellText(text: '5555'),
-          ),
-          DataCell(
-            CellText(text: '5555'),
-          ),
-        ],
-      ));
-    }
+    var contador = 0;
 
     _telemetriaDao.getTelemetria().then((value) {
-      print(value.setores);
+      // crio a quantidade de colunas do header a partir do setores
       for (var setor in value.setores!) {
         columns.add(
           DataColumn(
@@ -61,7 +48,49 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
             ),
           ),
         );
+
+        // adiciono a array setores a array situacoesSetores
+        situacoesSetores.add(setor.situacoes);
       }
+
+      for (var arrayCat = 0; arrayCat < arrayCategorias.length; arrayCat++) {
+        setState(() {
+          colunas = {};
+          contador = 0;
+        });
+
+        for (var situacoes in situacoesSetores) {
+          contador++;
+          // *quantidade de colunas/setores
+
+          for (var i = 0; i < situacoes.length; i++) {
+            // *quantidade de linhas/categorias
+
+            // verifico se no setor x, a situacao é igual ao id da categoria atual (arrayCat)
+            // e adiciono as maquinas aquela categoria
+            if (situacoes[i].idSituacao ==
+                arrayCategorias[arrayCat].idCategoria) {
+              colunas['categoria'] = arrayCategorias[arrayCat].descricao;
+              if (situacoes[i].maquinas!.isNotEmpty) {
+                setState(() {
+                  cellText = situacoes[i].maquinas[0].idMaquina;
+                  colunas['coluna$contador'] = cellText;
+                });
+              } else {
+                setState(() {
+                  cellText = '';
+                  colunas['coluna$contador'] = cellText;
+                });
+              }
+            }
+          }
+        }
+
+        setState(() {
+          arrayRows.add(colunas);
+        });
+      }
+
       setState(() {
         loadData = true;
       });
@@ -101,23 +130,40 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                     width: 1,
                     color: Colors.white,
                   ),
+                  // columns: const <DataColumn>[
+                  //   DataColumn(
+                  //     label: Text(
+                  //       'Name',
+                  //       style: TextStyle(fontStyle: FontStyle.italic),
+                  //     ),
+                  //   ),
+                  //   DataColumn(
+                  //     label: Text(
+                  //       'Name',
+                  //       style: TextStyle(fontStyle: FontStyle.italic),
+                  //     ),
+                  //   ),
+                  //   DataColumn(
+                  //     label: Text(
+                  //       'Name',
+                  //       style: TextStyle(fontStyle: FontStyle.italic),
+                  //     ),
+                  //   ),
+                  // ],
                   columns: columns,
-                  rows: rows,
-                  // rows: arrayCategorias
-                  //     .map(
-                  //       ((element) => DataRow(
-                  //             cells: <DataCell>[
-                  //               DataCell(CellText(text: element.descricao)),
-                  //               const DataCell(CellText(text: '19')),
-                  //               const DataCell(CellText(text: 'Student')),
-                  //               const DataCell(CellText(text: 'Student')),
-                  //               // const DataCell(CellText(text: 'Student')),
-                  //               // const DataCell(CellText(text: 'Student')),
-                  //               // const DataCell(CellText(text: 'Student')),
-                  //             ],
-                  //           )),
-                  //     )
-                  //     .toList(),
+                  rows: arrayRows.map((row) {
+                    return DataRow(
+                        cells: row.values.map((cellValue) {
+                      return DataCell(
+                        Text(
+                          cellValue,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }).toList());
+                  }).toList(),
                 ),
               )
             : Container(),
