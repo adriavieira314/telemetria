@@ -171,38 +171,11 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                     width: 1,
                     color: Colors.white,
                   ),
-                  // columns: const <DataColumn>[
-                  //   DataColumn(
-                  //     label: Text(
-                  //       'Name',
-                  //       style: TextStyle(fontStyle: FontStyle.italic),
-                  //     ),
-                  //   ),
-                  //   DataColumn(
-                  //     label: Text(
-                  //       'Name',
-                  //       style: TextStyle(fontStyle: FontStyle.italic),
-                  //     ),
-                  //   ),
-                  //   DataColumn(
-                  //     label: Text(
-                  //       'Name',
-                  //       style: TextStyle(fontStyle: FontStyle.italic),
-                  //     ),
-                  //   ),
-                  // ],
                   columns: columns,
                   rows: arrayRows.map((row) {
                     return DataRow(
                         cells: row.values.map((cellValue) {
-                      return DataCell(cellValue
-                          // Text(
-                          //   cellValue,
-                          //   style: TextStyle(
-                          //     color: Colors.white,
-                          //   ),
-                          // ),
-                          );
+                      return DataCell(cellValue);
                     }).toList());
                   }).toList(),
                 ),
@@ -235,19 +208,6 @@ class HeaderText extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(color: Colors.white, fontStyle: FontStyle.italic),
-    );
-  }
-}
-
-class CellText extends StatelessWidget {
-  final String text;
-  const CellText({Key? key, required this.text}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.white),
     );
   }
 }
