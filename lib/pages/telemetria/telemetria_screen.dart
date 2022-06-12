@@ -16,7 +16,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   final TelemetriaDao _telemetriaDao = TelemetriaDao();
   bool loadData = false;
   dynamic situacoesSetores = [];
-  late Text cellText;
+  late dynamic cellText;
 
   List<Map<String, dynamic>> arrayRows = [];
   Map<String, dynamic> colunas = {};
@@ -28,10 +28,17 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
       ),
     ),
   ];
-
   List<DataRow> rows = [];
-
   List<DataCell> cells = [];
+
+  getColor(String maquinaColor) {
+    String hex = '0xFF';
+    //situacoes[i].maquinas[0].corFonte
+    String color = maquinaColor.substring(1, 7);
+    String colorFormated = hex + color;
+    int hexColor = int.parse(colorFormated);
+    return hexColor;
+  }
 
   @override
   void initState() {
@@ -70,24 +77,43 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
             // e adiciono as maquinas aquela categoria
             if (situacoes[i].idSituacao ==
                 arrayCategorias[arrayCat].idCategoria) {
+              // adicionando ao objeto colunas um item categoria
               colunas['categoria'] = Text(
                 arrayCategorias[arrayCat].descricao,
                 style: const TextStyle(color: Colors.white),
               );
-              if (situacoes[i].maquinas!.isNotEmpty) {
-                String hex = '0xFF';
-                String getColor = situacoes[i].maquinas[0].corFonte;
-                String color = getColor.substring(1, 7);
-                String colorFormated = hex + color;
-                int hexColor = int.parse(colorFormated);
 
+              // adicionando ao objeto colunas a quantidade de celulas dinamicamente
+              if (situacoes[i].maquinas!.isNotEmpty) {
+                // adicionando as maquinas ao texto das celulas
                 setState(() {
-                  cellText = Text(
-                    situacoes[i].maquinas[0].idMaquina,
-                    style: TextStyle(
-                      color: Color(hexColor),
-                    ),
-                  );
+                  if (situacoes[i].maquinas.length > 1) {
+                    cellText = Row(
+                      children: situacoes[i]
+                          .maquinas
+                          .map<Widget>(
+                            (maquina) => Text(
+                              '${maquina.idMaquina} ',
+                              style: TextStyle(
+                                color: Color(
+                                  getColor(maquina.corFonte),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    );
+                  } else {
+                    cellText = Text(
+                      situacoes[i].maquinas[0].idMaquina,
+                      style: TextStyle(
+                        color: Color(
+                          getColor(situacoes[i].maquinas[0].corFonte),
+                        ),
+                      ),
+                    );
+                  }
+
                   colunas['coluna$contador'] = cellText;
                 });
               } else {
@@ -100,6 +126,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
           }
         }
 
+        // crio uma linha ao acabar o loop de setores e inicio novamente ate o loop arrayCategorias terminar
         setState(() {
           arrayRows.add(colunas);
         });
