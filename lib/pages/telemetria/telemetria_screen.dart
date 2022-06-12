@@ -16,10 +16,10 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   final TelemetriaDao _telemetriaDao = TelemetriaDao();
   bool loadData = false;
   dynamic situacoesSetores = [];
-  late String cellText;
+  late Text cellText;
 
-  List<Map<String, String>> arrayRows = [];
-  Map<String, String> colunas = {};
+  List<Map<String, dynamic>> arrayRows = [];
+  Map<String, dynamic> colunas = {};
 
   List<DataColumn> columns = [
     const DataColumn(
@@ -70,15 +70,29 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
             // e adiciono as maquinas aquela categoria
             if (situacoes[i].idSituacao ==
                 arrayCategorias[arrayCat].idCategoria) {
-              colunas['categoria'] = arrayCategorias[arrayCat].descricao;
+              colunas['categoria'] = Text(
+                arrayCategorias[arrayCat].descricao,
+                style: const TextStyle(color: Colors.white),
+              );
               if (situacoes[i].maquinas!.isNotEmpty) {
+                String hex = '0xFF';
+                String getColor = situacoes[i].maquinas[0].corFonte;
+                String color = getColor.substring(1, 7);
+                String colorFormated = hex + color;
+                int hexColor = int.parse(colorFormated);
+
                 setState(() {
-                  cellText = situacoes[i].maquinas[0].idMaquina;
+                  cellText = Text(
+                    situacoes[i].maquinas[0].idMaquina,
+                    style: TextStyle(
+                      color: Color(hexColor),
+                    ),
+                  );
                   colunas['coluna$contador'] = cellText;
                 });
               } else {
                 setState(() {
-                  cellText = '';
+                  cellText = const Text('');
                   colunas['coluna$contador'] = cellText;
                 });
               }
@@ -154,14 +168,14 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                   rows: arrayRows.map((row) {
                     return DataRow(
                         cells: row.values.map((cellValue) {
-                      return DataCell(
-                        Text(
-                          cellValue,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
+                      return DataCell(cellValue
+                          // Text(
+                          //   cellValue,
+                          //   style: TextStyle(
+                          //     color: Colors.white,
+                          //   ),
+                          // ),
+                          );
                     }).toList());
                   }).toList(),
                 ),
