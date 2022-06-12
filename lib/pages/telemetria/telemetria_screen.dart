@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:telemetria/constants/array_categorias.dart';
-import 'package:telemetria/models/telemetria.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen_text.dart';
 import 'package:telemetria/services/telemetriaDao/telemetria_dao.dart';
 
