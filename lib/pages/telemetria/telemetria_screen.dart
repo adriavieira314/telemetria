@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:telemetria/constants/array_categorias.dart';
+import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen_text.dart';
 import 'package:telemetria/services/telemetriaDao/telemetria_dao.dart';
 
@@ -181,19 +182,6 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
               )
             : Container(),
       ),
-    );
-  }
-}
-
-class AppBarText extends StatelessWidget {
-  final String text;
-  const AppBarText({Key? key, required this.text}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.red),
     );
   }
 }
