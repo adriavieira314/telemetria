@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:telemetria/models/categorias_paradas.dart';
+import 'package:telemetria/models/paradas.dart';
 import 'package:telemetria/models/setores.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
 import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.dart';
+import 'package:telemetria/services/paradas/paradas_dao.dart';
 import 'package:telemetria/services/setoresDao/setores_dao.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
@@ -20,9 +22,11 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   List selectedList = [];
   List<SetoresDisponiveis> listOfSetores = [];
   List<Categorias> listOfCategorias = [];
+  List<Paradas> listOfParadas = [];
   bool loadDropdown = false;
   String _configuracao = 'tempo';
   late Categorias dropdownValue;
+  bool isChecked = false;
 
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
@@ -34,6 +38,15 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   final SetoresDao _daoSetores = SetoresDao();
   final CategoriasParadasDao _categoriasParadasDao = CategoriasParadasDao();
+  final ParadasListDao _paradasListDao = ParadasListDao();
+  List<Paradas> paradasTipo0 = [];
+  List<Paradas> paradasTipo1 = [];
+  List<Paradas> paradasTipo2 = [];
+  List<Paradas> paradasTipo3 = [];
+  List<Paradas> paradasTipo4 = [];
+  List<Paradas> paradasTipo5 = [];
+  List<Paradas> paradasTipo6 = [];
+  List<Paradas> paradasTipo7 = [];
 
   @override
   void initState() {
@@ -50,6 +63,39 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       listOfCategorias.addAll(value.categorias!);
       dropdownValue = value.categorias![0];
       print(listOfCategorias);
+    });
+
+    _paradasListDao.getParadasList().then((value) {
+      for (var paradas in value.paradas!) {
+        // todas as paradas recebem um check true para dizer quais estao marcadas na lista
+        if (paradas.tipoPar != 0) {
+          setState(() {
+            paradas.check = true;
+          });
+        } else {
+          paradas.check = false;
+        }
+
+        if (paradas.tipoPar == 0) {
+          paradasTipo0.add(paradas);
+        } else if (paradas.tipoPar == 1) {
+          paradasTipo1.add(paradas);
+        } else if (paradas.tipoPar == 2) {
+          paradasTipo2.add(paradas);
+        } else if (paradas.tipoPar == 3) {
+          paradasTipo3.add(paradas);
+        } else if (paradas.tipoPar == 4) {
+          paradasTipo4.add(paradas);
+        } else if (paradas.tipoPar == 5) {
+          paradasTipo5.add(paradas);
+        } else if (paradas.tipoPar == 6) {
+          paradasTipo6.add(paradas);
+        } else if (paradas.tipoPar == 7) {
+          paradasTipo7.add(paradas);
+        }
+      }
+      listOfParadas.addAll(paradasTipo1);
+      listOfParadas.addAll(paradasTipo0);
     });
   }
 
@@ -87,7 +133,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                 label: 'Selecione os setores',
                                 multiSelectTag: 'Setores',
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.blue)),
+                                  border: Border.all(color: Colors.blue),
+                                ),
                                 multiSelect: true,
                                 prefixIcon: const Padding(
                                   padding: EdgeInsets.all(0.0),
@@ -155,7 +202,40 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                         onChanged: (Categorias? newValue) {
                                           setState(() {
                                             dropdownValue = newValue!;
-                                            print(dropdownValue);
+                                            print(dropdownValue.idCatPar);
+                                            // *preencho a listOfParadas com as paradas de cada categoria
+                                            // *e tambem preencho com as paradas do id 0
+                                            listOfParadas.clear();
+                                            if (dropdownValue.idCatPar == 1) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo1);
+                                            } else if (dropdownValue.idCatPar ==
+                                                2) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo2);
+                                            } else if (dropdownValue.idCatPar ==
+                                                3) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo3);
+                                            } else if (dropdownValue.idCatPar ==
+                                                4) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo4);
+                                            } else if (dropdownValue.idCatPar ==
+                                                5) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo5);
+                                            } else if (dropdownValue.idCatPar ==
+                                                6) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo6);
+                                            } else if (dropdownValue.idCatPar ==
+                                                7) {
+                                              listOfParadas
+                                                  .addAll(paradasTipo7);
+                                            }
+                                            // *preenchendo com as paradas id 0
+                                            listOfParadas.addAll(paradasTipo0);
                                           });
                                         },
                                         items: listOfCategorias
@@ -173,9 +253,29 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       left: 30.0, right: 30.0, bottom: 30.0),
-                                  child: CustomTextFormField(
-                                    label: 'Amarelo',
-                                    controller: _tempoAmarelo,
+                                  child: InkWell(
+                                    onTap: () => showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _displayDialog(context),
+                                    ),
+                                    child: TextFormField(
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(20.0),
+                                          ),
+                                        ),
+                                        labelText: 'Paradas',
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                      ),
+                                      readOnly: true,
+                                      enabled: false,
+                                      keyboardType: TextInputType.number,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -204,14 +304,14 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(_tempoBranco.text);
-                            print(_tempoAmarelo.text);
-                            print(_tempoVermelho.text);
-                            print(_refugoBranco.text);
-                            print(_refugoAmarelo.text);
-                            print(_refugoVermelho.text);
-                            print(_refugoProducao.text);
-                            print(selectedList);
+                            print(paradasTipo0);
+                            print(paradasTipo1);
+                            print(paradasTipo2);
+                            print(paradasTipo3);
+                            print(paradasTipo4);
+                            print(paradasTipo5);
+                            print(paradasTipo6);
+                            print(paradasTipo7);
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -257,6 +357,44 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
         ),
       ),
     );
+  }
+
+  _displayDialog(BuildContext context) {
+    return StatefulBuilder(builder: (context, setState) {
+      return AlertDialog(
+        title: const Text('Paradas'),
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: listOfParadas.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: 50,
+                  child: ListTile(
+                    leading: Checkbox(
+                      checkColor: Colors.white,
+                      value: listOfParadas[index].check,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          listOfParadas[index].check = value!;
+                        });
+                      },
+                    ),
+                    title: Text(listOfParadas[index].dsParada!),
+                  ),
+                );
+              }),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    });
   }
 }
 
