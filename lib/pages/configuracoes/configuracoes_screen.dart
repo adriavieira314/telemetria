@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:telemetria/models/categorias_paradas.dart';
 import 'package:telemetria/models/setores.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
+import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.dart';
 import 'package:telemetria/services/setoresDao/setores_dao.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
@@ -17,8 +19,11 @@ class ConfiguracoesScreen extends StatefulWidget {
 class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   List selectedList = [];
   List<SetoresDisponiveis> listOfSetores = [];
+  List<Categorias> listOfCategorias = [];
   bool loadDropdown = false;
   String _configuracao = 'tempo';
+  late Categorias dropdownValue;
+
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
   final TextEditingController _tempoVermelho = TextEditingController();
@@ -28,6 +33,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   final TextEditingController _refugoProducao = TextEditingController();
 
   final SetoresDao _daoSetores = SetoresDao();
+  final CategoriasParadasDao _categoriasParadasDao = CategoriasParadasDao();
 
   @override
   void initState() {
@@ -38,6 +44,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       setState(() {
         loadDropdown = true;
       });
+    });
+
+    _categoriasParadasDao.getCategorias().then((value) {
+      listOfCategorias.addAll(value.categorias!);
+      dropdownValue = value.categorias![0];
+      print(listOfCategorias);
     });
   }
 
@@ -67,27 +79,33 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                       Center(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.8,
-                          child: CustomSearchableDropDown(
-                            items: listOfSetores,
-                            label: 'Selecione os setores',
-                            multiSelectTag: 'Setores',
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.blue)),
-                            multiSelect: true,
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.all(0.0),
-                              child: Icon(Icons.search),
-                            ),
-                            dropDownMenuItems: listOfSetores.map((item) {
-                              return item.dsSetor;
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                selectedList = jsonDecode(value);
-                              } else {
-                                selectedList.clear();
-                              }
-                            },
+                          child: Column(
+                            children: [
+                              const Text('Selecione o setor:'),
+                              CustomSearchableDropDown(
+                                items: listOfSetores,
+                                label: 'Selecione os setores',
+                                multiSelectTag: 'Setores',
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.blue)),
+                                multiSelect: true,
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.all(0.0),
+                                  child: Icon(Icons.search),
+                                ),
+                                dropDownMenuItems: listOfSetores.map((item) {
+                                  return item.dsSetor;
+                                }).toList(),
+                                onChanged: (value) {
+                                  print(value);
+                                  if (value != null) {
+                                    selectedList = jsonDecode(value);
+                                  } else {
+                                    selectedList.clear();
+                                  }
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -98,23 +116,90 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           radioListTile('Peças Refugadas', 'refugo'),
                         ],
                       ),
-                      Visibility(
-                        visible: _configuracao == 'tempo',
-                        child: ConfiguracaoTempoParada(
-                          tempoBranco: _tempoBranco,
-                          tempoAmarelo: _tempoAmarelo,
-                          tempoVermelho: _tempoVermelho,
-                        ),
+                      Column(
+                        children: [
+                          const Text(
+                            'Configuração do Tipo\nde Parada',
+                            style: TextStyle(fontSize: 20.0),
+                            textAlign: TextAlign.center,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.6,
+                            color: const Color.fromARGB(255, 231, 229, 229),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(30.0),
+                                  child: InputDecorator(
+                                    decoration: const InputDecoration(
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      contentPadding: EdgeInsets.all(5.0),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.grey,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<Categorias>(
+                                        value: dropdownValue,
+                                        onChanged: (Categorias? newValue) {
+                                          setState(() {
+                                            dropdownValue = newValue!;
+                                            print(dropdownValue);
+                                          });
+                                        },
+                                        items: listOfCategorias
+                                            .map<DropdownMenuItem<Categorias>>(
+                                                (Categorias value) {
+                                          return DropdownMenuItem<Categorias>(
+                                            value: value,
+                                            child: Text(value.dsCatPar!),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 30.0, right: 30.0, bottom: 30.0),
+                                  child: CustomTextFormField(
+                                    label: 'Amarelo',
+                                    controller: _tempoAmarelo,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
                       ),
-                      Visibility(
-                        visible: _configuracao == 'refugo',
-                        child: ConfiguracaoPecasRefugadas(
-                          refugoBranco: _refugoBranco,
-                          refugoAmarelo: _refugoAmarelo,
-                          refugoVermelho: _refugoVermelho,
-                          refugoProducao: _refugoProducao,
-                        ),
-                      ),
+                      // Visibility(
+                      //   visible: _configuracao == 'tempo',
+                      //   child: ConfiguracaoTempoParada(
+                      //     tempoBranco: _tempoBranco,
+                      //     tempoAmarelo: _tempoAmarelo,
+                      //     tempoVermelho: _tempoVermelho,
+                      //   ),
+                      // ),
+                      // Visibility(
+                      //   visible: _configuracao == 'refugo',
+                      //   child: ConfiguracaoPecasRefugadas(
+                      //     refugoBranco: _refugoBranco,
+                      //     refugoAmarelo: _refugoAmarelo,
+                      //     refugoVermelho: _refugoVermelho,
+                      //     refugoProducao: _refugoProducao,
+                      //   ),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
@@ -126,6 +211,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                             print(_refugoAmarelo.text);
                             print(_refugoVermelho.text);
                             print(_refugoProducao.text);
+                            print(selectedList);
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
