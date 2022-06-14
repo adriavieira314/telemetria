@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const TelemetriaScreen(),
+      home: const ConfiguracoesScreen(),
     );
   }
 }

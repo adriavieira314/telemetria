@@ -2,12 +2,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:telemetria/models/telemetria.dart';
+import 'package:telemetria/utils/constants.dart';
 
 class TelemetriaDao {
   Future<Telemetria> getTelemetria() async {
     final response = await http.get(
       Uri.parse(
-        'http://localhost:8080/idw/rest/injet/monitorizacao/pam/telemetria',
+        '$serverURl/idw/rest/injet/monitorizacao/pam/telemetria',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
