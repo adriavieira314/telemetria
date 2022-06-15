@@ -5,6 +5,7 @@ import 'package:telemetria/models/paradas.dart';
 import 'package:telemetria/models/setores.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
+import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.dart';
 import 'package:telemetria/services/configuracoes/configuracoes_dao.dart';
 import 'package:telemetria/services/paradas/paradas_dao.dart';
@@ -209,18 +210,18 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                _configuracao = 'tipo';
-                              });
-                            },
-                            child: radioListTile('Tipo de Parada', 'tipo'),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
                                 _configuracao = 'refugo';
                               });
                             },
                             child: radioListTile('Peças Refugadas', 'refugo'),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _configuracao = 'tipo';
+                              });
+                            },
+                            child: radioListTile('Tipo de Parada', 'tipo'),
                           ),
                         ],
                       ),
@@ -276,6 +277,13 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                 .then((value) {
                               print('sucesso');
                               print(value);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      const TelemetriaScreen(),
+                                ),
+                              );
                             }).catchError((onError) {
                               print(onError);
                             });

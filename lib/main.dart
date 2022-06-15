@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
-import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 
 void main() {
   runApp(const MyApp());
