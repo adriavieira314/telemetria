@@ -1,7 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:telemetria/models/categorias_paradas.dart';
 import 'package:telemetria/models/paradas.dart';
@@ -146,7 +142,16 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           width: MediaQuery.of(context).size.width * 0.8,
                           child: Column(
                             children: [
-                              const Text('Selecione o setor:'),
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                  top: 8.0,
+                                  bottom: 15.0,
+                                ),
+                                child: Text(
+                                  'Selecione o setor:',
+                                  style: TextStyle(fontSize: 20.0),
+                                ),
+                              ),
                               InkWell(
                                 onTap: () => showDialog<String>(
                                   context: context,
@@ -157,8 +162,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(0.0),
+                                        Radius.circular(10.0),
                                       ),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.black),
                                     ),
                                     labelText: 'Selecionar setores',
                                     labelStyle: TextStyle(color: Colors.black),
@@ -181,146 +190,27 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           radioListTile('Peças Refugadas', 'refugo'),
                         ],
                       ),
-                      Column(
-                        children: [
-                          const Text(
-                            'Configuração do Tipo\nde Parada',
-                            style: TextStyle(fontSize: 20.0),
-                            textAlign: TextAlign.center,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.6,
-                            color: const Color.fromARGB(255, 231, 229, 229),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(30.0),
-                                  child: InputDecorator(
-                                    decoration: const InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      contentPadding: EdgeInsets.all(5.0),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Colors.grey,
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0),
-                                        ),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<Categorias>(
-                                        value: dropdownValue,
-                                        onChanged: (Categorias? newValue) {
-                                          setState(() {
-                                            dropdownValue = newValue!;
-                                            idCategoriaParada =
-                                                dropdownValue.idCatPar!;
-                                            print('idCategoriaParada');
-                                            print(idCategoriaParada);
-                                            // *preencho a listOfParadas com as paradas de cada categoria
-                                            // *e tambem preencho com as paradas do id 0
-                                            listOfParadas.clear();
-                                            if (dropdownValue.idCatPar == 1) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo1);
-                                            } else if (dropdownValue.idCatPar ==
-                                                2) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo2);
-                                            } else if (dropdownValue.idCatPar ==
-                                                3) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo3);
-                                            } else if (dropdownValue.idCatPar ==
-                                                4) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo4);
-                                            } else if (dropdownValue.idCatPar ==
-                                                5) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo5);
-                                            } else if (dropdownValue.idCatPar ==
-                                                6) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo6);
-                                            } else if (dropdownValue.idCatPar ==
-                                                7) {
-                                              listOfParadas
-                                                  .addAll(paradasTipo7);
-                                            }
-                                            // *preenchendo com as paradas id 0
-                                            listOfParadas.addAll(paradasTipo0);
-                                          });
-                                        },
-                                        items: listOfCategorias
-                                            .map<DropdownMenuItem<Categorias>>(
-                                                (Categorias value) {
-                                          return DropdownMenuItem<Categorias>(
-                                            value: value,
-                                            child: Text(value.dsCatPar!),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 30.0, right: 30.0, bottom: 30.0),
-                                  child: InkWell(
-                                    onTap: () => showDialog<String>(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          _displayParadasDialog(context),
-                                    ),
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(20.0),
-                                          ),
-                                        ),
-                                        labelText: 'Paradas',
-                                        labelStyle:
-                                            TextStyle(color: Colors.black),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                      ),
-                                      readOnly: true,
-                                      enabled: false,
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
+                      Visibility(
+                        visible: _configuracao == 'tempo',
+                        child: ConfiguracaoTempoParada(
+                          tempoBranco: _tempoBranco,
+                          tempoAmarelo: _tempoAmarelo,
+                          tempoVermelho: _tempoVermelho,
+                        ),
                       ),
-                      // Visibility(
-                      //   visible: _configuracao == 'tempo',
-                      //   child: ConfiguracaoTempoParada(
-                      //     tempoBranco: _tempoBranco,
-                      //     tempoAmarelo: _tempoAmarelo,
-                      //     tempoVermelho: _tempoVermelho,
-                      //   ),
-                      // ),
-                      // Visibility(
-                      //   visible: _configuracao == 'refugo',
-                      //   child: ConfiguracaoPecasRefugadas(
-                      //     refugoBranco: _refugoBranco,
-                      //     refugoAmarelo: _refugoAmarelo,
-                      //     refugoVermelho: _refugoVermelho,
-                      //     refugoProducao: _refugoProducao,
-                      //   ),
-                      // ),
+                      Visibility(
+                        visible: _configuracao == 'tipo',
+                        child: configuracaoTipoParada(context),
+                      ),
+                      Visibility(
+                        visible: _configuracao == 'refugo',
+                        child: ConfiguracaoPecasRefugadas(
+                          refugoBranco: _refugoBranco,
+                          refugoAmarelo: _refugoAmarelo,
+                          refugoVermelho: _refugoVermelho,
+                          refugoProducao: _refugoProducao,
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
@@ -363,6 +253,122 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     );
   }
 
+  Column configuracaoTipoParada(BuildContext context) {
+    return Column(
+      children: [
+        const Text(
+          'Configuração do Tipo\nde Parada',
+          style: TextStyle(fontSize: 20.0),
+          textAlign: TextAlign.center,
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width * 0.6,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            color: const Color.fromARGB(255, 231, 229, 229),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(8.0),
+            ),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: EdgeInsets.all(5.0),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0),
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<Categorias>(
+                      value: dropdownValue,
+                      onChanged: (Categorias? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                          idCategoriaParada = dropdownValue.idCatPar!;
+                          print('idCategoriaParada');
+                          print(idCategoriaParada);
+                          // *preencho a listOfParadas com as paradas de cada categoria
+                          // *e tambem preencho com as paradas do id 0
+                          listOfParadas.clear();
+                          if (dropdownValue.idCatPar == 1) {
+                            listOfParadas.addAll(paradasTipo1);
+                          } else if (dropdownValue.idCatPar == 2) {
+                            listOfParadas.addAll(paradasTipo2);
+                          } else if (dropdownValue.idCatPar == 3) {
+                            listOfParadas.addAll(paradasTipo3);
+                          } else if (dropdownValue.idCatPar == 4) {
+                            listOfParadas.addAll(paradasTipo4);
+                          } else if (dropdownValue.idCatPar == 5) {
+                            listOfParadas.addAll(paradasTipo5);
+                          } else if (dropdownValue.idCatPar == 6) {
+                            listOfParadas.addAll(paradasTipo6);
+                          } else if (dropdownValue.idCatPar == 7) {
+                            listOfParadas.addAll(paradasTipo7);
+                          }
+                          // *preenchendo com as paradas id 0
+                          listOfParadas.addAll(paradasTipo0);
+                        });
+                      },
+                      items: listOfCategorias.map<DropdownMenuItem<Categorias>>(
+                          (Categorias value) {
+                        return DropdownMenuItem<Categorias>(
+                          value: value,
+                          child: Text(value.dsCatPar!),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 30.0, right: 30.0, bottom: 30.0),
+                child: InkWell(
+                  onTap: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        _displayParadasDialog(context),
+                  ),
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
+                      labelText: 'Paradas',
+                      labelStyle: TextStyle(color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    readOnly: true,
+                    enabled: false,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
   ListTile radioListTile(String title, String value) {
     return ListTile(
       title: Text(title),
@@ -401,14 +407,17 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                             !listOfParadas[index].check!;
                       });
                     },
-                    leading: Checkbox(
-                      checkColor: Colors.white,
-                      value: listOfParadas[index].check,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          listOfParadas[index].check = value!;
-                        });
-                      },
+                    leading: Transform.scale(
+                      scale: 1.7,
+                      child: Checkbox(
+                        checkColor: Colors.white,
+                        value: listOfParadas[index].check,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            listOfParadas[index].check = value!;
+                          });
+                        },
+                      ),
                     ),
                     title: Text(listOfParadas[index].dsParada!),
                   ),
@@ -500,14 +509,17 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                             !listOfSetores[index].check!;
                       });
                     },
-                    leading: Checkbox(
-                      checkColor: Colors.white,
-                      value: listOfSetores[index].check,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          listOfSetores[index].check = value!;
-                        });
-                      },
+                    leading: Transform.scale(
+                      scale: 1.7,
+                      child: Checkbox(
+                        checkColor: Colors.white,
+                        value: listOfSetores[index].check,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            listOfSetores[index].check = value!;
+                          });
+                        },
+                      ),
                     ),
                     title: Text(listOfSetores[index].dsSetor!),
                   ),
@@ -599,7 +611,13 @@ class ConfiguracaoTempoParada extends StatelessWidget {
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
-          color: const Color.fromARGB(255, 231, 229, 229),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            color: const Color.fromARGB(255, 231, 229, 229),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(8.0),
+            ),
+          ),
           child: Column(
             children: [
               Padding(
@@ -656,7 +674,13 @@ class ConfiguracaoPecasRefugadas extends StatelessWidget {
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
-          color: const Color.fromARGB(255, 231, 229, 229),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            color: const Color.fromARGB(255, 231, 229, 229),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(8.0),
+            ),
+          ),
           child: Column(
             children: [
               Padding(
