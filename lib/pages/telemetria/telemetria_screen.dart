@@ -180,7 +180,9 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                   }).toList(),
                 ),
               )
-            : Container(),
+            : const Center(
+                child: CircularProgressIndicator(),
+              ),
       ),
     );
   }

@@ -198,9 +198,30 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                       ),
                       Column(
                         children: <Widget>[
-                          radioListTile('Tempo de Parada', 'tempo'),
-                          radioListTile('Tipo de Parada', 'tipo'),
-                          radioListTile('Peças Refugadas', 'refugo'),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _configuracao = 'tempo';
+                              });
+                            },
+                            child: radioListTile('Tempo de Parada', 'tempo'),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _configuracao = 'tipo';
+                              });
+                            },
+                            child: radioListTile('Tipo de Parada', 'tipo'),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _configuracao = 'refugo';
+                              });
+                            },
+                            child: radioListTile('Peças Refugadas', 'refugo'),
+                          ),
                         ],
                       ),
                       Visibility(
@@ -226,15 +247,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            // print(_tempoBranco.text.runtimeType);
-                            // print(_tempoAmarelo.text.runtimeType);
-                            // print(_tempoVermelho.text.runtimeType);
-                            // print(_refugoBranco.text.runtimeType);
-                            // print(_refugoAmarelo.text.runtimeType);
-                            // print(_refugoVermelho.text.runtimeType);
-                            // print(_refugoProducao.text.runtimeType);
-                            // print(objParTipo7.paradas);
-                            // print(selectedListOfSetores);
                             var configuracoesJson = Configuracoes(
                               setoreSelecionados: selectedListOfSetores,
                               paradasPorCategoria: [
@@ -259,7 +271,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                   int.parse(_tempoAmarelo.text),
                             );
 
-                            print(configuracoesJson);
                             _configuracoesDao
                                 .saveConfiguracoes(configuracoesJson)
                                 .then((value) {
