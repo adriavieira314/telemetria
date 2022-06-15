@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:telemetria/models/categorias_paradas.dart';
+import 'package:telemetria/models/configuracoes.dart';
 import 'package:telemetria/models/paradas.dart';
 import 'package:telemetria/models/setores.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
 import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.dart';
+import 'package:telemetria/services/configuracoes/configuracoes_dao.dart';
 import 'package:telemetria/services/paradas/paradas_dao.dart';
 import 'package:telemetria/services/setoresDao/setores_dao.dart';
 
@@ -16,7 +18,7 @@ class ConfiguracoesScreen extends StatefulWidget {
 }
 
 class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
-  List selectedListOfSetores = [];
+  List<SetoreSelecionados> selectedListOfSetores = [];
   List<SetoresDisponiveis> listOfSetores = [];
   List<Categorias> listOfCategorias = [];
   List<Paradas> listOfParadas = [];
@@ -28,15 +30,15 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
-  final TextEditingController _tempoVermelho = TextEditingController();
   final TextEditingController _refugoBranco = TextEditingController();
   final TextEditingController _refugoAmarelo = TextEditingController();
-  final TextEditingController _refugoVermelho = TextEditingController();
   final TextEditingController _refugoProducao = TextEditingController();
 
   final SetoresDao _daoSetores = SetoresDao();
   final CategoriasParadasDao _categoriasParadasDao = CategoriasParadasDao();
   final ParadasListDao _paradasListDao = ParadasListDao();
+  final ConfiguracoesDao _configuracoesDao = ConfiguracoesDao();
+
   List<Paradas> paradasTipo0 = [];
   List<Paradas> paradasTipo1 = [];
   List<Paradas> paradasTipo2 = [];
@@ -46,14 +48,23 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   List<Paradas> paradasTipo6 = [];
   List<Paradas> paradasTipo7 = [];
 
-  List parCodTipo0 = [];
-  List parCodTipo1 = [];
-  List parCodTipo2 = [];
-  List parCodTipo3 = [];
-  List parCodTipo4 = [];
-  List parCodTipo5 = [];
-  List parCodTipo6 = [];
-  List parCodTipo7 = [];
+  List<String> parCodTipo0 = [];
+  List<String> parCodTipo1 = [];
+  List<String> parCodTipo2 = [];
+  List<String> parCodTipo3 = [];
+  List<String> parCodTipo4 = [];
+  List<String> parCodTipo5 = [];
+  List<String> parCodTipo6 = [];
+  List<String> parCodTipo7 = [];
+
+  late ParadasPorCategoria objParTipo0;
+  late ParadasPorCategoria objParTipo1;
+  late ParadasPorCategoria objParTipo2;
+  late ParadasPorCategoria objParTipo3;
+  late ParadasPorCategoria objParTipo4;
+  late ParadasPorCategoria objParTipo5;
+  late ParadasPorCategoria objParTipo6;
+  late ParadasPorCategoria objParTipo7;
 
   @override
   void initState() {
@@ -85,32 +96,34 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
         if (paradas.tipoPar == 0) {
           paradasTipo0.add(paradas);
-          parCodTipo0.add(paradas.cdParada);
+          parCodTipo0.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 1) {
           paradasTipo1.add(paradas);
-          parCodTipo1.add(paradas.cdParada);
+          parCodTipo1.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 2) {
           paradasTipo2.add(paradas);
-          parCodTipo2.add(paradas.cdParada);
+          parCodTipo2.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 3) {
           paradasTipo3.add(paradas);
-          parCodTipo3.add(paradas.cdParada);
+          parCodTipo3.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 4) {
           paradasTipo4.add(paradas);
-          parCodTipo4.add(paradas.cdParada);
+          parCodTipo4.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 5) {
           paradasTipo5.add(paradas);
-          parCodTipo5.add(paradas.cdParada);
+          parCodTipo5.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 6) {
           paradasTipo6.add(paradas);
-          parCodTipo6.add(paradas.cdParada);
+          parCodTipo6.add(paradas.cdParada!);
         } else if (paradas.tipoPar == 7) {
           paradasTipo7.add(paradas);
-          parCodTipo7.add(paradas.cdParada);
+          parCodTipo7.add(paradas.cdParada!);
         }
       }
       listOfParadas.addAll(paradasTipo1);
       listOfParadas.addAll(paradasTipo0);
+
+      paradasPorCategoriaObjects();
     });
   }
 
@@ -195,7 +208,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         child: ConfiguracaoTempoParada(
                           tempoBranco: _tempoBranco,
                           tempoAmarelo: _tempoAmarelo,
-                          tempoVermelho: _tempoVermelho,
                         ),
                       ),
                       Visibility(
@@ -207,7 +219,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         child: ConfiguracaoPecasRefugadas(
                           refugoBranco: _refugoBranco,
                           refugoAmarelo: _refugoAmarelo,
-                          refugoVermelho: _refugoVermelho,
                           refugoProducao: _refugoProducao,
                         ),
                       ),
@@ -215,15 +226,48 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(parCodTipo0);
-                            print(parCodTipo1);
-                            print(parCodTipo2);
-                            print(parCodTipo3);
-                            print(parCodTipo4);
-                            print(parCodTipo5);
-                            print(parCodTipo6);
-                            print(parCodTipo7);
-                            print(selectedListOfSetores);
+                            // print(_tempoBranco.text.runtimeType);
+                            // print(_tempoAmarelo.text.runtimeType);
+                            // print(_tempoVermelho.text.runtimeType);
+                            // print(_refugoBranco.text.runtimeType);
+                            // print(_refugoAmarelo.text.runtimeType);
+                            // print(_refugoVermelho.text.runtimeType);
+                            // print(_refugoProducao.text.runtimeType);
+                            // print(objParTipo7.paradas);
+                            // print(selectedListOfSetores);
+                            var configuracoesJson = Configuracoes(
+                              setoreSelecionados: selectedListOfSetores,
+                              paradasPorCategoria: [
+                                objParTipo0,
+                                objParTipo1,
+                                objParTipo2,
+                                objParTipo3,
+                                objParTipo4,
+                                objParTipo5,
+                                objParTipo6,
+                                objParTipo7,
+                              ],
+                              refugoProdReferencia:
+                                  int.parse(_refugoProducao.text),
+                              refugoVlrLimiteBranco:
+                                  int.parse(_refugoBranco.text),
+                              refugoVlrLimiteAmarelo:
+                                  int.parse(_refugoAmarelo.text),
+                              paradaTempoLimiteBranco:
+                                  int.parse(_tempoBranco.text),
+                              paradaTempoLimiteAmarelo:
+                                  int.parse(_tempoAmarelo.text),
+                            );
+
+                            print(configuracoesJson);
+                            _configuracoesDao
+                                .saveConfiguracoes(configuracoesJson)
+                                .then((value) {
+                              print('sucesso');
+                              print(value);
+                            }).catchError((onError) {
+                              print(onError);
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -435,48 +479,48 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                 if (paradas.check == false) {
                   setState(() {
                     paradasTipo0.add(paradas);
-                    parCodTipo0.add(paradas.cdParada);
+                    parCodTipo0.add(paradas.cdParada!);
                   });
                 } else {
                   if (idCategoriaParada == 1) {
                     setState(() {
                       paradasTipo1.add(paradas);
-                      parCodTipo1.add(paradas.cdParada);
+                      parCodTipo1.add(paradas.cdParada!);
                     });
                   } else if (idCategoriaParada == 2) {
                     setState(() {
                       paradasTipo2.add(paradas);
-                      parCodTipo2.add(paradas.cdParada);
+                      parCodTipo2.add(paradas.cdParada!);
                     });
                   } else if (idCategoriaParada == 3) {
                     setState(() {
                       paradasTipo3.add(paradas);
-                      parCodTipo3.add(paradas.cdParada);
+                      parCodTipo3.add(paradas.cdParada!);
                     });
                   } else if (idCategoriaParada == 4) {
                     setState(() {
                       paradasTipo4.add(paradas);
-                      parCodTipo4.add(paradas.cdParada);
+                      parCodTipo4.add(paradas.cdParada!);
                     });
                   } else if (idCategoriaParada == 5) {
                     setState(() {
                       paradasTipo5.add(paradas);
-                      parCodTipo5.add(paradas.cdParada);
+                      parCodTipo5.add(paradas.cdParada!);
                     });
                   } else if (idCategoriaParada == 6) {
                     setState(() {
                       paradasTipo6.add(paradas);
-                      parCodTipo6.add(paradas.cdParada);
+                      parCodTipo6.add(paradas.cdParada!);
                     });
                   } else if (idCategoriaParada == 7) {
                     setState(() {
                       paradasTipo7.add(paradas);
-                      parCodTipo7.add(paradas.cdParada);
+                      parCodTipo7.add(paradas.cdParada!);
                     });
                   }
                 }
               }
-
+              paradasPorCategoriaObjects();
               Navigator.pop(context, 'OK');
             },
             child: const Text('OK'),
@@ -534,7 +578,9 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
               for (var setor in listOfSetores) {
                 if (setor.check == true) {
                   setState(() {
-                    selectedListOfSetores.add(setor.cdSetor);
+                    selectedListOfSetores.add(
+                      SetoreSelecionados(cdSetor: setor.cdSetor),
+                    );
                   });
                 }
               }
@@ -586,18 +632,27 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       });
     }
   }
+
+  paradasPorCategoriaObjects() {
+    objParTipo0 = ParadasPorCategoria(idCatPar: 0, paradas: parCodTipo0);
+    objParTipo1 = ParadasPorCategoria(idCatPar: 1, paradas: parCodTipo1);
+    objParTipo2 = ParadasPorCategoria(idCatPar: 2, paradas: parCodTipo2);
+    objParTipo3 = ParadasPorCategoria(idCatPar: 3, paradas: parCodTipo3);
+    objParTipo4 = ParadasPorCategoria(idCatPar: 4, paradas: parCodTipo4);
+    objParTipo5 = ParadasPorCategoria(idCatPar: 5, paradas: parCodTipo5);
+    objParTipo6 = ParadasPorCategoria(idCatPar: 6, paradas: parCodTipo6);
+    objParTipo7 = ParadasPorCategoria(idCatPar: 7, paradas: parCodTipo7);
+  }
 }
 
 class ConfiguracaoTempoParada extends StatelessWidget {
   final TextEditingController tempoBranco;
   final TextEditingController tempoAmarelo;
-  final TextEditingController tempoVermelho;
 
   const ConfiguracaoTempoParada({
     Key? key,
     required this.tempoBranco,
     required this.tempoAmarelo,
-    required this.tempoVermelho,
   }) : super(key: key);
 
   @override
@@ -628,17 +683,11 @@ class ConfiguracaoTempoParada extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                padding: const EdgeInsets.only(
+                    left: 30.0, right: 30.0, bottom: 30.0),
                 child: CustomTextFormField(
                   label: 'Amarelo',
                   controller: tempoAmarelo,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(30.0),
-                child: CustomTextFormField(
-                  label: 'Vermelho',
-                  controller: tempoVermelho,
                 ),
               ),
             ],
@@ -652,14 +701,12 @@ class ConfiguracaoTempoParada extends StatelessWidget {
 class ConfiguracaoPecasRefugadas extends StatelessWidget {
   final TextEditingController refugoBranco;
   final TextEditingController refugoAmarelo;
-  final TextEditingController refugoVermelho;
   final TextEditingController refugoProducao;
 
   const ConfiguracaoPecasRefugadas({
     Key? key,
     required this.refugoBranco,
     required this.refugoAmarelo,
-    required this.refugoVermelho,
     required this.refugoProducao,
   }) : super(key: key);
 
@@ -695,14 +742,6 @@ class ConfiguracaoPecasRefugadas extends StatelessWidget {
                 child: CustomTextFormField(
                   label: 'Amarelo',
                   controller: refugoAmarelo,
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.only(top: 30.0, left: 30.0, right: 30.0),
-                child: CustomTextFormField(
-                  label: 'Vermelho',
-                  controller: refugoVermelho,
                 ),
               ),
               Padding(
