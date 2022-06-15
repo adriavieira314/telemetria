@@ -50,12 +50,23 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   List<Paradas> paradasTipo6 = [];
   List<Paradas> paradasTipo7 = [];
 
+  List parCodTipo0 = [];
+  List parCodTipo1 = [];
+  List parCodTipo2 = [];
+  List parCodTipo3 = [];
+  List parCodTipo4 = [];
+  List parCodTipo5 = [];
+  List parCodTipo6 = [];
+  List parCodTipo7 = [];
+
   @override
   void initState() {
     super.initState();
     _daoSetores.getSetoresList().then((value) {
-      listOfSetores.addAll(value.setores!);
-      print(listOfSetores);
+      for (var setor in value.setores!) {
+        setor.check = false;
+        listOfSetores.add(setor);
+      }
       setState(() {
         loadDropdown = true;
       });
@@ -78,20 +89,28 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
         if (paradas.tipoPar == 0) {
           paradasTipo0.add(paradas);
+          parCodTipo0.add(paradas.cdParada);
         } else if (paradas.tipoPar == 1) {
           paradasTipo1.add(paradas);
+          parCodTipo1.add(paradas.cdParada);
         } else if (paradas.tipoPar == 2) {
           paradasTipo2.add(paradas);
+          parCodTipo2.add(paradas.cdParada);
         } else if (paradas.tipoPar == 3) {
           paradasTipo3.add(paradas);
+          parCodTipo3.add(paradas.cdParada);
         } else if (paradas.tipoPar == 4) {
           paradasTipo4.add(paradas);
+          parCodTipo4.add(paradas.cdParada);
         } else if (paradas.tipoPar == 5) {
           paradasTipo5.add(paradas);
+          parCodTipo5.add(paradas.cdParada);
         } else if (paradas.tipoPar == 6) {
           paradasTipo6.add(paradas);
+          parCodTipo6.add(paradas.cdParada);
         } else if (paradas.tipoPar == 7) {
           paradasTipo7.add(paradas);
+          parCodTipo7.add(paradas.cdParada);
         }
       }
       listOfParadas.addAll(paradasTipo1);
@@ -128,29 +147,28 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           child: Column(
                             children: [
                               const Text('Selecione o setor:'),
-                              CustomSearchableDropDown(
-                                items: listOfSetores,
-                                label: 'Selecione os setores',
-                                multiSelectTag: 'Setores',
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.blue),
+                              InkWell(
+                                onTap: () => showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      _displaySetoresDialog(context),
                                 ),
-                                multiSelect: true,
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.all(0.0),
-                                  child: Icon(Icons.search),
+                                child: TextFormField(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(0.0),
+                                      ),
+                                    ),
+                                    labelText: 'Selecionar setores',
+                                    labelStyle: TextStyle(color: Colors.black),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                  readOnly: true,
+                                  enabled: false,
+                                  keyboardType: TextInputType.number,
                                 ),
-                                dropDownMenuItems: listOfSetores.map((item) {
-                                  return item.dsSetor;
-                                }).toList(),
-                                onChanged: (value) {
-                                  print(value);
-                                  if (value != null) {
-                                    selectedListOfSetores = jsonDecode(value);
-                                  } else {
-                                    selectedListOfSetores.clear();
-                                  }
-                                },
                               ),
                             ],
                           ),
@@ -260,7 +278,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                     onTap: () => showDialog<String>(
                                       context: context,
                                       builder: (BuildContext context) =>
-                                          _displayDialog(context),
+                                          _displayParadasDialog(context),
                                     ),
                                     child: TextFormField(
                                       decoration: const InputDecoration(
@@ -307,19 +325,15 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            var setoreSelecionadosArray = [];
-                            for (var setores in selectedListOfSetores) {
-                              // selectedListOfSetores.add(setores['cdSetor']);
-                              print(setores['cdSetor']);
-                            }
-                            // print(paradasTipo1);
-                            // print(paradasTipo2);
-                            // print(paradasTipo3);
-                            // print(paradasTipo4);
-                            // print(paradasTipo5);
-                            // print(paradasTipo6);
-                            // print(paradasTipo7);
-                            // print(selectedListOfSetores);
+                            print(parCodTipo0);
+                            print(parCodTipo1);
+                            print(parCodTipo2);
+                            print(parCodTipo3);
+                            print(parCodTipo4);
+                            print(parCodTipo5);
+                            print(parCodTipo6);
+                            print(parCodTipo7);
+                            print(selectedListOfSetores);
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -367,7 +381,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     );
   }
 
-  _displayDialog(BuildContext context) {
+  _displayParadasDialog(BuildContext context) {
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
         title: const Text('Paradas'),
@@ -381,6 +395,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                 return SizedBox(
                   height: 50,
                   child: ListTile(
+                    onTap: () {
+                      setState(() {
+                        listOfParadas[index].check =
+                            !listOfParadas[index].check!;
+                      });
+                    },
                     leading: Checkbox(
                       checkColor: Colors.white,
                       value: listOfParadas[index].check,
@@ -400,42 +420,110 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
             onPressed: () {
               clearArray();
               paradasTipo0.clear();
+              parCodTipo0.clear();
 
               for (var paradas in listOfParadas) {
                 if (paradas.check == false) {
                   setState(() {
                     paradasTipo0.add(paradas);
+                    parCodTipo0.add(paradas.cdParada);
                   });
                 } else {
                   if (idCategoriaParada == 1) {
                     setState(() {
                       paradasTipo1.add(paradas);
+                      parCodTipo1.add(paradas.cdParada);
                     });
                   } else if (idCategoriaParada == 2) {
                     setState(() {
                       paradasTipo2.add(paradas);
+                      parCodTipo2.add(paradas.cdParada);
                     });
                   } else if (idCategoriaParada == 3) {
                     setState(() {
                       paradasTipo3.add(paradas);
+                      parCodTipo3.add(paradas.cdParada);
                     });
                   } else if (idCategoriaParada == 4) {
                     setState(() {
                       paradasTipo4.add(paradas);
+                      parCodTipo4.add(paradas.cdParada);
                     });
                   } else if (idCategoriaParada == 5) {
                     setState(() {
                       paradasTipo5.add(paradas);
+                      parCodTipo5.add(paradas.cdParada);
                     });
                   } else if (idCategoriaParada == 6) {
                     setState(() {
                       paradasTipo6.add(paradas);
+                      parCodTipo6.add(paradas.cdParada);
                     });
                   } else if (idCategoriaParada == 7) {
                     setState(() {
                       paradasTipo7.add(paradas);
+                      parCodTipo7.add(paradas.cdParada);
                     });
                   }
+                }
+              }
+
+              Navigator.pop(context, 'OK');
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    });
+  }
+
+  _displaySetoresDialog(BuildContext context) {
+    return StatefulBuilder(builder: (context, setState) {
+      return AlertDialog(
+        title: const Text(
+          'Setores',
+          textAlign: TextAlign.center,
+        ),
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: listOfSetores.length,
+              itemBuilder: (BuildContext context, int index) {
+                return SizedBox(
+                  height: 50,
+                  child: ListTile(
+                    onTap: () {
+                      setState(() {
+                        listOfSetores[index].check =
+                            !listOfSetores[index].check!;
+                      });
+                    },
+                    leading: Checkbox(
+                      checkColor: Colors.white,
+                      value: listOfSetores[index].check,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          listOfSetores[index].check = value!;
+                        });
+                      },
+                    ),
+                    title: Text(listOfSetores[index].dsSetor!),
+                  ),
+                );
+              }),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              selectedListOfSetores.clear();
+
+              for (var setor in listOfSetores) {
+                if (setor.check == true) {
+                  setState(() {
+                    selectedListOfSetores.add(setor.cdSetor);
+                  });
                 }
               }
 
@@ -452,30 +540,37 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     if (idCategoriaParada == 1) {
       setState(() {
         paradasTipo1.clear();
+        parCodTipo1.clear();
       });
     } else if (idCategoriaParada == 2) {
       setState(() {
         paradasTipo2.clear();
+        parCodTipo2.clear();
       });
     } else if (idCategoriaParada == 3) {
       setState(() {
         paradasTipo3.clear();
+        parCodTipo3.clear();
       });
     } else if (idCategoriaParada == 4) {
       setState(() {
         paradasTipo4.clear();
+        parCodTipo4.clear();
       });
     } else if (idCategoriaParada == 5) {
       setState(() {
         paradasTipo5.clear();
+        parCodTipo5.clear();
       });
     } else if (idCategoriaParada == 6) {
       setState(() {
         paradasTipo6.clear();
+        parCodTipo6.clear();
       });
     } else if (idCategoriaParada == 7) {
       setState(() {
         paradasTipo7.clear();
+        parCodTipo7.clear();
       });
     }
   }
