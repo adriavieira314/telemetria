@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
@@ -19,7 +20,7 @@ class ConfiguracoesScreen extends StatefulWidget {
 }
 
 class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
-  List selectedList = [];
+  List selectedListOfSetores = [];
   List<SetoresDisponiveis> listOfSetores = [];
   List<Categorias> listOfCategorias = [];
   List<Paradas> listOfParadas = [];
@@ -27,6 +28,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   String _configuracao = 'tempo';
   late Categorias dropdownValue;
   bool isChecked = false;
+  int idCategoriaParada = 1;
 
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
@@ -69,9 +71,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       for (var paradas in value.paradas!) {
         // todas as paradas recebem um check true para dizer quais estao marcadas na lista
         if (paradas.tipoPar != 0) {
-          setState(() {
-            paradas.check = true;
-          });
+          paradas.check = true;
         } else {
           paradas.check = false;
         }
@@ -146,9 +146,9 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                 onChanged: (value) {
                                   print(value);
                                   if (value != null) {
-                                    selectedList = jsonDecode(value);
+                                    selectedListOfSetores = jsonDecode(value);
                                   } else {
-                                    selectedList.clear();
+                                    selectedListOfSetores.clear();
                                   }
                                 },
                               ),
@@ -202,7 +202,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                         onChanged: (Categorias? newValue) {
                                           setState(() {
                                             dropdownValue = newValue!;
-                                            print(dropdownValue.idCatPar);
+                                            idCategoriaParada =
+                                                dropdownValue.idCatPar!;
+                                            print('idCategoriaParada');
+                                            print(idCategoriaParada);
                                             // *preencho a listOfParadas com as paradas de cada categoria
                                             // *e tambem preencho com as paradas do id 0
                                             listOfParadas.clear();
@@ -304,14 +307,19 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(paradasTipo0);
-                            print(paradasTipo1);
-                            print(paradasTipo2);
-                            print(paradasTipo3);
-                            print(paradasTipo4);
-                            print(paradasTipo5);
-                            print(paradasTipo6);
-                            print(paradasTipo7);
+                            var setoreSelecionadosArray = [];
+                            for (var setores in selectedListOfSetores) {
+                              // selectedListOfSetores.add(setores['cdSetor']);
+                              print(setores['cdSetor']);
+                            }
+                            // print(paradasTipo1);
+                            // print(paradasTipo2);
+                            // print(paradasTipo3);
+                            // print(paradasTipo4);
+                            // print(paradasTipo5);
+                            // print(paradasTipo6);
+                            // print(paradasTipo7);
+                            // print(selectedListOfSetores);
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -370,7 +378,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
               padding: const EdgeInsets.all(8),
               itemCount: listOfParadas.length,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
+                return SizedBox(
                   height: 50,
                   child: ListTile(
                     leading: Checkbox(
@@ -387,14 +395,89 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                 );
               }),
         ),
-        actions: <Widget>[
+        actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
+            onPressed: () {
+              clearArray();
+              paradasTipo0.clear();
+
+              for (var paradas in listOfParadas) {
+                if (paradas.check == false) {
+                  setState(() {
+                    paradasTipo0.add(paradas);
+                  });
+                } else {
+                  if (idCategoriaParada == 1) {
+                    setState(() {
+                      paradasTipo1.add(paradas);
+                    });
+                  } else if (idCategoriaParada == 2) {
+                    setState(() {
+                      paradasTipo2.add(paradas);
+                    });
+                  } else if (idCategoriaParada == 3) {
+                    setState(() {
+                      paradasTipo3.add(paradas);
+                    });
+                  } else if (idCategoriaParada == 4) {
+                    setState(() {
+                      paradasTipo4.add(paradas);
+                    });
+                  } else if (idCategoriaParada == 5) {
+                    setState(() {
+                      paradasTipo5.add(paradas);
+                    });
+                  } else if (idCategoriaParada == 6) {
+                    setState(() {
+                      paradasTipo6.add(paradas);
+                    });
+                  } else if (idCategoriaParada == 7) {
+                    setState(() {
+                      paradasTipo7.add(paradas);
+                    });
+                  }
+                }
+              }
+
+              Navigator.pop(context, 'OK');
+            },
             child: const Text('OK'),
           ),
         ],
       );
     });
+  }
+
+  clearArray() {
+    if (idCategoriaParada == 1) {
+      setState(() {
+        paradasTipo1.clear();
+      });
+    } else if (idCategoriaParada == 2) {
+      setState(() {
+        paradasTipo2.clear();
+      });
+    } else if (idCategoriaParada == 3) {
+      setState(() {
+        paradasTipo3.clear();
+      });
+    } else if (idCategoriaParada == 4) {
+      setState(() {
+        paradasTipo4.clear();
+      });
+    } else if (idCategoriaParada == 5) {
+      setState(() {
+        paradasTipo5.clear();
+      });
+    } else if (idCategoriaParada == 6) {
+      setState(() {
+        paradasTipo6.clear();
+      });
+    } else if (idCategoriaParada == 7) {
+      setState(() {
+        paradasTipo7.clear();
+      });
+    }
   }
 }
 
