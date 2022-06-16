@@ -197,33 +197,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           ),
                         ),
                       ),
-                      Column(
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _configuracao = 'tempo';
-                              });
-                            },
-                            child: radioListTile('Tempo de Parada', 'tempo'),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _configuracao = 'refugo';
-                              });
-                            },
-                            child: radioListTile('Peças Refugadas', 'refugo'),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _configuracao = 'tipo';
-                              });
-                            },
-                            child: radioListTile('Tipo de Parada', 'tipo'),
-                          ),
-                        ],
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: MediaQuery.of(context).orientation ==
+                                Orientation.portrait
+                            ? portraitView()
+                            : landscapeView(),
                       ),
                       Visibility(
                         visible: _configuracao == 'tempo',
@@ -313,6 +292,69 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           : const Center(
               child: CircularProgressIndicator(),
             ),
+    );
+  }
+
+  Row landscapeView() {
+    return Row(
+      children: <Widget>[
+        InkWell(
+          onTap: () {
+            setState(() {
+              _configuracao = 'tempo';
+            });
+          },
+          child: radioListTile('Tempo de Parada', 'tempo'),
+        ),
+        InkWell(
+          onTap: () {
+            setState(() {
+              _configuracao = 'refugo';
+            });
+          },
+          child: radioListTile('Peças Refugadas', 'refugo'),
+        ),
+        InkWell(
+          onTap: () {
+            setState(() {
+              _configuracao = 'tipo';
+            });
+          },
+          child: radioListTile('Tipo de Parada', 'tipo'),
+        ),
+      ],
+    );
+  }
+
+  Column portraitView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        InkWell(
+          onTap: () {
+            setState(() {
+              _configuracao = 'tempo';
+            });
+          },
+          child: radioListTile('Tempo de Parada', 'tempo'),
+        ),
+        InkWell(
+          onTap: () {
+            setState(() {
+              _configuracao = 'refugo';
+            });
+          },
+          child: radioListTile('Peças Refugadas', 'refugo'),
+        ),
+        InkWell(
+          onTap: () {
+            setState(() {
+              _configuracao = 'tipo';
+            });
+          },
+          child: radioListTile('Tipo de Parada', 'tipo'),
+        ),
+      ],
     );
   }
 
@@ -432,19 +474,22 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     );
   }
 
-  ListTile radioListTile(String title, String value) {
-    return ListTile(
-      title: Text(title),
-      leading: Transform.scale(
-        scale: 1.8,
-        child: Radio(
-          value: value,
-          groupValue: _configuracao,
-          onChanged: (String? value) {
-            setState(() {
-              _configuracao = value!;
-            });
-          },
+  Container radioListTile(String title, String value) {
+    return Container(
+      width: 300,
+      child: ListTile(
+        title: Text(title),
+        leading: Transform.scale(
+          scale: 1.8,
+          child: Radio(
+            value: value,
+            groupValue: _configuracao,
+            onChanged: (String? value) {
+              setState(() {
+                _configuracao = value!;
+              });
+            },
+          ),
         ),
       ),
     );
