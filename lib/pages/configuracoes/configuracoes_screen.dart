@@ -197,8 +197,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           ),
                         ),
                       ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
                         child: MediaQuery.of(context).orientation ==
                                 Orientation.portrait
                             ? portraitView()
@@ -297,6 +297,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   Row landscapeView() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         InkWell(
           onTap: () {
@@ -474,8 +475,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     );
   }
 
-  Container radioListTile(String title, String value) {
-    return Container(
+  SizedBox radioListTile(String title, String value) {
+    return SizedBox(
       width: 300,
       child: ListTile(
         title: Text(title),
