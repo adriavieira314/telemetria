@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:telemetria/main.dart';
 import 'package:telemetria/models/categorias_paradas.dart';
 import 'package:telemetria/models/configuracoes.dart';
 import 'package:telemetria/models/paradas.dart';
@@ -10,6 +11,7 @@ import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.da
 import 'package:telemetria/services/configuracoes/configuracoes_dao.dart';
 import 'package:telemetria/services/paradas/paradas_dao.dart';
 import 'package:telemetria/services/setoresDao/setores_dao.dart';
+import 'package:telemetria/utils/constants.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
   const ConfiguracoesScreen({Key? key}) : super(key: key);
@@ -23,11 +25,13 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   List<SetoresDisponiveis> listOfSetores = [];
   List<Categorias> listOfCategorias = [];
   List<Paradas> listOfParadas = [];
-  bool loadDropdown = false;
+  bool loadingPage = false;
   String _configuracao = 'tempo';
   late Categorias dropdownValue;
   bool isChecked = false;
   int idCategoriaParada = 1;
+  bool showGraph = false;
+  bool erroNaChamada = false;
 
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
@@ -67,25 +71,15 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   late ParadasPorCategoria objParTipo6;
   late ParadasPorCategoria objParTipo7;
 
-  @override
-  void initState() {
-    super.initState();
-    _daoSetores.getSetoresList().then((value) {
-      for (var setor in value.setores!) {
-        setor.check = false;
-        listOfSetores.add(setor);
-      }
-      setState(() {
-        loadDropdown = true;
-      });
-    });
-
+  void getCategoriasParadas() {
     _categoriasParadasDao.getCategorias().then((value) {
       listOfCategorias.addAll(value.categorias!);
       dropdownValue = value.categorias![0];
       print(listOfCategorias);
     });
+  }
 
+  void getParadasList() {
     _paradasListDao.getParadasList().then((value) {
       for (var paradas in value.paradas!) {
         // todas as paradas recebem um check true para dizer quais estao marcadas na lista
@@ -125,6 +119,35 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       listOfParadas.addAll(paradasTipo0);
 
       paradasPorCategoriaObjects();
+
+      if (mounted) {
+        setState(() {
+          loadingPage = true;
+          erroNaChamada = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _daoSetores.getSetoresList().then((value) {
+      for (var setor in value.setores!) {
+        setor.check = false;
+        listOfSetores.add(setor);
+      }
+
+      getCategoriasParadas();
+      getParadasList();
+    }).catchError((onError) {
+      if (mounted) {
+        setState(() {
+          loadingPage = false;
+          erroNaChamada = true;
+        });
+        mensagemErro = onError;
+      }
     });
   }
 
@@ -132,166 +155,205 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         elevation: 0,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            AppBarText(text: ConfiguracoesScreenText.empresa),
-            // AppBarText(text: ConfiguracoesScreenText.titulo),
-            // AppBarText(text: ConfiguracoesScreenText.logo),
+            AppBarText(text: ConfiguracoesScreenText.titulo),
           ],
         ),
-      ),
-      body: loadDropdown
-          ? CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Center(
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Column(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(
-                                  top: 8.0,
-                                  bottom: 15.0,
+        actions: [
+          erroNaChamada
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 18.0, left: 25.0),
+                  child: PopupMenuButton(
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 1,
+                        onTap: () => {
+                          Future.delayed(
+                            const Duration(seconds: 0),
+                            () => showDialog(
+                              context: context,
+                              builder: (context) => const AlertDialog(
+                                title: Text(
+                                  'Configuração',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                child: Text(
-                                  'Selecione o setor:',
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
+                                content: Configuracao(),
                               ),
-                              InkWell(
-                                onTap: () => showDialog<String>(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      _displaySetoresDialog(context),
-                                ),
-                                child: TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10.0),
-                                      ),
-                                    ),
-                                    disabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.black),
-                                    ),
-                                    labelText: 'Selecionar setores',
-                                    labelStyle: TextStyle(color: Colors.black),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                  ),
-                                  readOnly: true,
-                                  enabled: false,
-                                  keyboardType: TextInputType.number,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? portraitView()
-                            : landscapeView(),
-                      ),
-                      Visibility(
-                        visible: _configuracao == 'tempo',
-                        child: ConfiguracaoTempoParada(
-                          tempoBranco: _tempoBranco,
-                          tempoAmarelo: _tempoAmarelo,
-                        ),
-                      ),
-                      Visibility(
-                        visible: _configuracao == 'tipo',
-                        child: configuracaoTipoParada(context),
-                      ),
-                      Visibility(
-                        visible: _configuracao == 'refugo',
-                        child: ConfiguracaoPecasRefugadas(
-                          refugoBranco: _refugoBranco,
-                          refugoAmarelo: _refugoAmarelo,
-                          refugoProducao: _refugoProducao,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            var configuracoesJson = Configuracoes(
-                              setoreSelecionados: selectedListOfSetores,
-                              paradasPorCategoria: [
-                                objParTipo0,
-                                objParTipo1,
-                                objParTipo2,
-                                objParTipo3,
-                                objParTipo4,
-                                objParTipo5,
-                                objParTipo6,
-                                objParTipo7,
-                              ],
-                              refugoProdReferencia:
-                                  int.parse(_refugoProducao.text),
-                              refugoVlrLimiteBranco:
-                                  int.parse(_refugoBranco.text),
-                              refugoVlrLimiteAmarelo:
-                                  int.parse(_refugoAmarelo.text),
-                              paradaTempoLimiteBranco:
-                                  int.parse(_tempoBranco.text),
-                              paradaTempoLimiteAmarelo:
-                                  int.parse(_tempoAmarelo.text),
-                            );
-
-                            _configuracoesDao
-                                .saveConfiguracoes(configuracoesJson)
-                                .then((value) {
-                              print('sucesso');
-                              print(value);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      const TelemetriaScreen(),
-                                ),
-                              );
-                            }).catchError((onError) {
-                              print(onError);
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 25.0, horizontal: 70.0),
-                            elevation: 5,
-                          ),
-                          child: const Text(
-                            'Concluir',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                            ),
-                          ),
+                          )
+                        },
+                        child: Text(
+                          'Configuração',
+                          style: TextStyle(
+                              color:
+                                  erroNaChamada ? Colors.black : Colors.white),
                         ),
                       ),
                     ],
                   ),
+                )
+              : Container()
+        ],
+      ),
+      body: erroNaChamada
+          ? const MensagemErro()
+          : loadingPage
+              ? CustomScrollView(
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Center(
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              child: Column(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      bottom: 15.0,
+                                    ),
+                                    child: Text(
+                                      'Selecione o setor:',
+                                      style: TextStyle(fontSize: 20.0),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () => showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _displaySetoresDialog(context),
+                                    ),
+                                    child: TextFormField(
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0),
+                                          ),
+                                        ),
+                                        disabledBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.black),
+                                        ),
+                                        labelText: 'Selecionar setores',
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                      ),
+                                      readOnly: true,
+                                      enabled: false,
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: MediaQuery.of(context).orientation ==
+                                    Orientation.portrait
+                                ? portraitView()
+                                : landscapeView(),
+                          ),
+                          Visibility(
+                            visible: _configuracao == 'tempo',
+                            child: ConfiguracaoTempoParada(
+                              tempoBranco: _tempoBranco,
+                              tempoAmarelo: _tempoAmarelo,
+                            ),
+                          ),
+                          Visibility(
+                            visible: _configuracao == 'tipo',
+                            child: configuracaoTipoParada(context),
+                          ),
+                          Visibility(
+                            visible: _configuracao == 'refugo',
+                            child: ConfiguracaoPecasRefugadas(
+                              refugoBranco: _refugoBranco,
+                              refugoAmarelo: _refugoAmarelo,
+                              refugoProducao: _refugoProducao,
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 25.0, bottom: 25.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                var configuracoesJson = Configuracoes(
+                                  setoreSelecionados: selectedListOfSetores,
+                                  paradasPorCategoria: [
+                                    objParTipo0,
+                                    objParTipo1,
+                                    objParTipo2,
+                                    objParTipo3,
+                                    objParTipo4,
+                                    objParTipo5,
+                                    objParTipo6,
+                                    objParTipo7,
+                                  ],
+                                  refugoProdReferencia:
+                                      int.parse(_refugoProducao.text),
+                                  refugoVlrLimiteBranco:
+                                      int.parse(_refugoBranco.text),
+                                  refugoVlrLimiteAmarelo:
+                                      int.parse(_refugoAmarelo.text),
+                                  paradaTempoLimiteBranco:
+                                      int.parse(_tempoBranco.text),
+                                  paradaTempoLimiteAmarelo:
+                                      int.parse(_tempoAmarelo.text),
+                                );
+
+                                _configuracoesDao
+                                    .saveConfiguracoes(configuracoesJson)
+                                    .then((value) {
+                                  print('sucesso');
+                                  print(value);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (BuildContext context) =>
+                                          const TelemetriaScreen(),
+                                    ),
+                                  );
+                                }).catchError((onError) {
+                                  print(onError);
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 25.0, horizontal: 70.0),
+                                elevation: 5,
+                              ),
+                              child: const Text(
+                                'Concluir',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : const Center(
+                  child: CircularProgressIndicator(),
                 ),
-              ],
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
     );
   }
 
@@ -852,6 +914,142 @@ class CustomTextFormField extends StatelessWidget {
         fillColor: Colors.white,
       ),
       keyboardType: TextInputType.number,
+    );
+  }
+}
+
+class MensagemErro extends StatelessWidget {
+  const MensagemErro({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: Text(
+              '${mensagemErro.toString()}.  Link servidor: $serverURL',
+              style: const TextStyle(color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Vá para menu para alterar o servidor',
+                style: TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Container(
+                  width: 40.0,
+                  height: 40.0,
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                    size: 32.0,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Configuracao extends StatelessWidget {
+  const Configuracao({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController serverController = TextEditingController();
+    final TextEditingController portController = TextEditingController();
+
+    prefs.getString('server') != null
+        ? serverController.text = prefs.getString('server')!
+        : serverController.text = "";
+
+    prefs.getString('port') != null
+        ? portController.text = prefs.getString('port')!
+        : portController.text = "";
+
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: 250.0,
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Servidor',
+                ),
+                controller: serverController,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira o servidor';
+                  }
+                  return null;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: TextFormField(
+                  onTap: () {},
+                  decoration: const InputDecoration(
+                    labelText: 'Porta',
+                  ),
+                  controller: portController,
+                  keyboardType: TextInputType.number,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira a porta';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      prefs.setString('server', serverController.text);
+                      prefs.setString('port', portController.text);
+                      getServer();
+                      Navigator.pop(context);
+                      RestartWidget.restartApp(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 25.0),
+                    elevation: 5,
+                  ),
+                  child: const Text(
+                    'Finalizar',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

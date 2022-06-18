@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-String serverURL = ''; //http://192.168.0.107:8080
+String serverURL = '';
+Exception mensagemErro = Exception();
+int tempoDeEspera = 30;
 
 void getServer() async {
   final prefs = await SharedPreferences.getInstance();

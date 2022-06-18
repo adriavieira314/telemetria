@@ -13,6 +13,14 @@ class SetoresDao {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
+    ).timeout(
+      Duration(seconds: tempoDeEspera),
+      onTimeout: () {
+        return http.Response(
+          'Tempo de espera de resposta da URL excedeu',
+          408,
+        ); // Request Timeout response status code
+      },
     );
 
     if (response.statusCode == 200) {
@@ -23,7 +31,7 @@ class SetoresDao {
     } else {
       print('error ao receber setores');
       print(response.body);
-      throw Exception('Erro ao receber dados da Setores. ${response.body}');
+      throw Exception('Erro ao receber dados de Setores. ${response.body}');
     }
   }
 }
