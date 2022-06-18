@@ -9,6 +9,7 @@ import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.dart';
 import 'package:telemetria/services/configuracoes/configuracoes_dao.dart';
+import 'package:telemetria/services/configuracoes_salvas/configuracoes_salvas_dao.dart';
 import 'package:telemetria/services/paradas/paradas_dao.dart';
 import 'package:telemetria/services/setoresDao/setores_dao.dart';
 import 'package:telemetria/utils/constants.dart';
@@ -43,6 +44,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   final CategoriasParadasDao _categoriasParadasDao = CategoriasParadasDao();
   final ParadasListDao _paradasListDao = ParadasListDao();
   final ConfiguracoesDao _configuracoesDao = ConfiguracoesDao();
+  final ConfiguracoesSalvasDao _configuracoesSalvasDao =
+      ConfiguracoesSalvasDao();
 
   List<Paradas> paradasTipo0 = [];
   List<Paradas> paradasTipo1 = [];
@@ -147,6 +150,18 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           erroNaChamada = true;
         });
         mensagemErro = onError;
+      }
+    });
+
+    _configuracoesSalvasDao.getConfiguracoes().then((value) {
+      if (mounted) {
+        setState(() {
+          _tempoBranco.text = value.paradaTempoLimiteBranco.toString();
+          _tempoAmarelo.text = value.paradaTempoLimiteAmarelo.toString();
+          _refugoBranco.text = value.refugoVlrLimiteBranco.toString();
+          _refugoAmarelo.text = value.refugoVlrLimiteAmarelo.toString();
+          _refugoProducao.text = value.refugoProdReferencia.toString();
+        });
       }
     });
   }
@@ -805,7 +820,7 @@ class ConfiguracaoTempoParada extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(30.0),
                 child: CustomTextFormField(
-                  label: 'Branco',
+                  label: 'Branco (em segundos)',
                   controller: tempoBranco,
                 ),
               ),
@@ -813,7 +828,7 @@ class ConfiguracaoTempoParada extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     left: 30.0, right: 30.0, bottom: 30.0),
                 child: CustomTextFormField(
-                  label: 'Amarelo',
+                  label: 'Amarelo (em segundos)',
                   controller: tempoAmarelo,
                 ),
               ),
@@ -860,14 +875,14 @@ class ConfiguracaoPecasRefugadas extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(30.0),
                 child: CustomTextFormField(
-                  label: 'Branco',
+                  label: 'Branco (em segundos)',
                   controller: refugoBranco,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30.0, right: 30.0),
                 child: CustomTextFormField(
-                  label: 'Amarelo',
+                  label: 'Amarelo (em segundos)',
                   controller: refugoAmarelo,
                 ),
               ),
