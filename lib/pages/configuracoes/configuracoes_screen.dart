@@ -33,6 +33,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   int idCategoriaParada = 1;
   bool showGraph = false;
   bool erroNaChamada = false;
+  String qtdSetoresSelecionados = '';
 
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
@@ -132,16 +133,49 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     });
   }
 
+  void getSetoresNaoSelecionados() {
+    _daoSetores.getSetoresList().then((value) {
+      // *adicionando a array listOfSetores os setores não selecionados
+      for (var setor in value.setores!) {
+        if (listOfSetores.every((item) => item.cdSetor != setor.cdSetor)) {
+          setor.check = false;
+          listOfSetores.add(setor);
+        }
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    _daoSetores.getSetoresList().then((value) {
-      for (var setor in value.setores!) {
-        setor.check = false;
+
+    _configuracoesSalvasDao.getConfiguracoes().then((value) {
+      selectedListOfSetores.clear();
+      // *adicionando a array listOfSetores os setores selecionados
+      for (var setor in value.setoreSelecionados!) {
+        setor.check = true;
         listOfSetores.add(setor);
+        selectedListOfSetores.add(
+          SetoreSelecionados(cdSetor: setor.cdSetor),
+        );
+      }
+
+      if (mounted) {
+        setState(() {
+          // *setando o valor inicial
+          _tempoBranco.text = value.paradaTempoLimiteBranco.toString();
+          _tempoAmarelo.text = value.paradaTempoLimiteAmarelo.toString();
+          _refugoBranco.text = value.refugoVlrLimiteBranco.toString();
+          _refugoAmarelo.text = value.refugoVlrLimiteAmarelo.toString();
+          _refugoProducao.text = value.refugoProdReferencia.toString();
+          qtdSetoresSelecionados = selectedListOfSetores.length.toString();
+        });
       }
 
       getCategoriasParadas();
+      getSetoresNaoSelecionados();
+      // getParadasList() deve ser ultimo a ser chamado pois coloquei o loadingPage e o erroNaChamada nele
+      // essas duas variaveis devem mudar quando a ultima chamada rest foi finalizada
       getParadasList();
     }).catchError((onError) {
       if (mounted) {
@@ -150,18 +184,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           erroNaChamada = true;
         });
         mensagemErro = onError;
-      }
-    });
-
-    _configuracoesSalvasDao.getConfiguracoes().then((value) {
-      if (mounted) {
-        setState(() {
-          _tempoBranco.text = value.paradaTempoLimiteBranco.toString();
-          _tempoAmarelo.text = value.paradaTempoLimiteAmarelo.toString();
-          _refugoBranco.text = value.refugoVlrLimiteBranco.toString();
-          _refugoAmarelo.text = value.refugoVlrLimiteAmarelo.toString();
-          _refugoProducao.text = value.refugoProdReferencia.toString();
-        });
       }
     });
   }
@@ -246,21 +268,29 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                       context: context,
                                       builder: (BuildContext context) =>
                                           _displaySetoresDialog(context),
-                                    ),
+                                    ).then((value) => {
+                                          setState(() {
+                                            qtdSetoresSelecionados =
+                                                selectedListOfSetores.length
+                                                    .toString();
+                                          })
+                                        }),
                                     child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(
+                                      decoration: InputDecoration(
+                                        border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                             Radius.circular(10.0),
                                           ),
                                         ),
-                                        disabledBorder: OutlineInputBorder(
+                                        disabledBorder:
+                                            const OutlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.black),
                                         ),
-                                        labelText: 'Selecionar setores',
-                                        labelStyle:
-                                            TextStyle(color: Colors.black),
+                                        labelText:
+                                            '$qtdSetoresSelecionados setores selecionados',
+                                        labelStyle: const TextStyle(
+                                            color: Colors.black),
                                         filled: true,
                                         fillColor: Colors.white,
                                       ),
@@ -483,8 +513,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         setState(() {
                           dropdownValue = newValue!;
                           idCategoriaParada = dropdownValue.idCatPar!;
-                          print('idCategoriaParada');
-                          print(idCategoriaParada);
                           // *preencho a listOfParadas com as paradas de cada categoria
                           // *e tambem preencho com as paradas do id 0
                           listOfParadas.clear();

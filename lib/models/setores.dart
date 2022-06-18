@@ -26,7 +26,7 @@ class SetoresDisponiveis {
   String? dsSetor;
   bool? check;
 
-  SetoresDisponiveis({this.cdSetor, this.dsSetor});
+  SetoresDisponiveis({this.cdSetor, this.dsSetor, this.check});
 
   SetoresDisponiveis.fromJson(Map<String, dynamic> json) {
     cdSetor = json['cdSetor'];

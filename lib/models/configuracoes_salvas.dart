@@ -1,5 +1,7 @@
+import 'package:telemetria/models/setores.dart';
+
 class ConfiguracoesSalvas {
-  List<SetoreSelecionados>? setoreSelecionados;
+  List<SetoresDisponiveis>? setoreSelecionados;
   List<ParadasPorCategoria>? paradasPorCategoria;
   int? refugoProdReferencia;
   int? refugoVlrLimiteBranco;
@@ -18,9 +20,9 @@ class ConfiguracoesSalvas {
 
   ConfiguracoesSalvas.fromJson(Map<String, dynamic> json) {
     if (json['setoreSelecionados'] != null) {
-      setoreSelecionados = <SetoreSelecionados>[];
+      setoreSelecionados = <SetoresDisponiveis>[];
       json['setoreSelecionados'].forEach((v) {
-        setoreSelecionados!.add(SetoreSelecionados.fromJson(v));
+        setoreSelecionados!.add(SetoresDisponiveis.fromJson(v));
       });
     }
     if (json['paradasPorCategoria'] != null) {
@@ -55,24 +57,27 @@ class ConfiguracoesSalvas {
   }
 }
 
-class SetoreSelecionados {
-  String? cdSetor;
-  String? dsSetor;
+// class SetoreSelecionados {
+//   String? cdSetor;
+//   String? dsSetor;
+//   bool? check;
 
-  SetoreSelecionados({this.cdSetor, this.dsSetor});
+//   SetoreSelecionados({this.cdSetor, this.dsSetor});
 
-  SetoreSelecionados.fromJson(Map<String, dynamic> json) {
-    cdSetor = json['cdSetor'];
-    dsSetor = json['dsSetor'];
-  }
+//   SetoreSelecionados.fromJson(Map<String, dynamic> json) {
+//     cdSetor = json['cdSetor'];
+//     dsSetor = json['dsSetor'];
+//     check = json['check'];
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['cdSetor'] = cdSetor;
-    data['dsSetor'] = dsSetor;
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['cdSetor'] = cdSetor;
+//     data['dsSetor'] = dsSetor;
+//     data['check'] = check;
+//     return data;
+//   }
+// }
 
 class ParadasPorCategoria {
   int? idCatPar;
