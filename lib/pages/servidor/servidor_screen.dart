@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:telemetria/main.dart';
+import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
+import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
 import 'package:telemetria/utils/constants.dart';
 
 class ServidorScreen extends StatefulWidget {
@@ -23,7 +25,13 @@ class _ServidorScreenState extends State<ServidorScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: const Text('Telemetria - PAM Plásticos'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            AppBarText(text: ConfiguracoesScreenText.empresa),
+            AppBarText(text: 'TELEMETRIA'),
+          ],
+        ),
         centerTitle: true,
       ),
       body: CustomScrollView(
