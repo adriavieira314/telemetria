@@ -8,7 +8,7 @@ class CategoriasParadasDao {
   Future<CategoriasParadas> getCategorias() async {
     final response = await http.get(
       Uri.parse(
-        '$serverURl/idw/rest/injet/monitorizacao/pam/telemetria/categoriasparadas',
+        '$serverURL/idw/rest/injet/monitorizacao/pam/telemetria/categoriasparadas',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

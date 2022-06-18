@@ -8,7 +8,7 @@ class SetoresDao {
   Future<SetoresList> getSetoresList() async {
     final response = await http.get(
       Uri.parse(
-        '$serverURl/idw/rest/injet/monitorizacao/pam/telemetria/setores',
+        '$serverURL/idw/rest/injet/monitorizacao/pam/telemetria/setores',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

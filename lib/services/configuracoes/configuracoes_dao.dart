@@ -8,7 +8,7 @@ class ConfiguracoesDao {
   Future<http.Response> saveConfiguracoes(Configuracoes jsonBody) async {
     final response = await http.post(
       Uri.parse(
-        '$serverURl/idw/rest/injet/monitorizacao/pam/telemetria/configuracoes/salvar',
+        '$serverURL/idw/rest/injet/monitorizacao/pam/telemetria/configuracoes/salvar',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

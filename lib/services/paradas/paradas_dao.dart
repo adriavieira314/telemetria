@@ -8,7 +8,7 @@ class ParadasListDao {
   Future<ParadasList> getParadasList() async {
     final response = await http.get(
       Uri.parse(
-        '$serverURl/idw/rest/injet/monitorizacao/pam/telemetria/paradas',
+        '$serverURL/idw/rest/injet/monitorizacao/pam/telemetria/paradas',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

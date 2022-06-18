@@ -8,7 +8,7 @@ class TelemetriaDao {
   Future<Telemetria> getTelemetria() async {
     final response = await http.get(
       Uri.parse(
-        '$serverURl/idw/rest/injet/monitorizacao/pam/telemetria',
+        '$serverURL/idw/rest/injet/monitorizacao/pam/telemetria',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

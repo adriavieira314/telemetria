@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
+import 'package:telemetria/pages/servidor/servidor_screen.dart';
+import 'package:telemetria/utils/constants.dart';
 
-void main() {
+late SharedPreferences prefs;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  prefs = await SharedPreferences.getInstance();
+  getServer();
+
   runApp(const MyApp());
 }
 
@@ -15,7 +24,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const ConfiguracoesScreen(),
+      home: prefs.getString('server') == null
+          ? const ServidorScreen()
+          : const ConfiguracoesScreen(),
     );
   }
 }
