@@ -972,7 +972,7 @@ class Configuracao extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     final TextEditingController serverController = TextEditingController();
     final TextEditingController portController = TextEditingController();
 
@@ -989,7 +989,7 @@ class Configuracao extends StatelessWidget {
         height: 250.0,
         width: MediaQuery.of(context).size.width * 0.6,
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1026,7 +1026,7 @@ class Configuracao extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
+                    if (formKey.currentState!.validate()) {
                       prefs.setString('server', serverController.text);
                       prefs.setString('port', portController.text);
                       getServer();
