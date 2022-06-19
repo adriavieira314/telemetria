@@ -96,7 +96,8 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
               // adicionando ao objeto colunas um item categoria
               colunas['categoria'] = Text(
                 arrayCategorias[arrayCat].descricao,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               );
 
               // adicionando ao objeto colunas a quantidade de celulas dinamicamente
@@ -104,7 +105,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                 // adicionando as maquinas ao texto das celulas
                 setState(() {
                   if (situacoes[i].maquinas.length > 1) {
-                    cellText = Row(
+                    cellText = Wrap(
                       children: situacoes[i]
                           .maquinas
                           .map<Widget>(
@@ -114,7 +115,10 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                                 color: Color(
                                   getColor(maquina.corFonte),
                                 ),
+                                // fontSize: 15,
+                                fontWeight: FontWeight.bold,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           )
                           .toList(),
@@ -126,6 +130,8 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                         color: Color(
                           getColor(situacoes[i].maquinas[0].corFonte),
                         ),
+                        // fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     );
                   }
@@ -171,7 +177,16 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            AppBarText(text: _timeString.toString()),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.2,
+              child: FittedBox(
+                child: Text(
+                  _timeString,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
+            // AppBarText(text: _timeString.toString()),
             const AppBarText(text: TelemetriaScreenText.titulo),
           ],
         ),
@@ -183,6 +198,8 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
             ? Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.grey),
                 child: DataTable(
+                  horizontalMargin: 0,
+                  columnSpacing: 10,
                   dataRowHeight: (MediaQuery.of(context).size.height -
                           AppBar().preferredSize.height -
                           headingRowHeight) /
@@ -215,9 +232,18 @@ class HeaderText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.white, fontStyle: FontStyle.italic),
+    return Wrap(
+      direction: Axis.vertical,
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 }

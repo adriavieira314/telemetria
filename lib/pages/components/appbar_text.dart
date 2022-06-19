@@ -6,9 +6,14 @@ class AppBarText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.red),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.3,
+      child: FittedBox(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.red),
+        ),
+      ),
     );
   }
 }
