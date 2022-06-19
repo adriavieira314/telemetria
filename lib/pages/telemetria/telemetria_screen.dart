@@ -46,7 +46,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
 
   void _getTime() {
     final String formattedDateTime =
-        DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()).toString();
+        DateFormat('dd/MM/yyyy kk:mm:ss').format(DateTime.now()).toString();
     print(formattedDateTime);
     setState(() {
       _timeString = formattedDateTime;
