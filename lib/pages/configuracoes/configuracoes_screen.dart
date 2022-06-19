@@ -651,61 +651,67 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              clearArray();
-              paradasTipo0.clear();
-              parCodTipo0.clear();
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                clearArray();
+                paradasTipo0.clear();
+                parCodTipo0.clear();
 
-              for (var paradas in listOfParadas) {
-                if (paradas.check == false) {
-                  setState(() {
-                    paradasTipo0.add(paradas);
-                    parCodTipo0.add(paradas.cdParada!);
-                  });
-                } else {
-                  if (idCategoriaParada == 1) {
+                for (var paradas in listOfParadas) {
+                  if (paradas.check == false) {
                     setState(() {
-                      paradasTipo1.add(paradas);
-                      parCodTipo1.add(paradas.cdParada!);
+                      paradasTipo0.add(paradas);
+                      parCodTipo0.add(paradas.cdParada!);
                     });
-                  } else if (idCategoriaParada == 2) {
-                    setState(() {
-                      paradasTipo2.add(paradas);
-                      parCodTipo2.add(paradas.cdParada!);
-                    });
-                  } else if (idCategoriaParada == 3) {
-                    setState(() {
-                      paradasTipo3.add(paradas);
-                      parCodTipo3.add(paradas.cdParada!);
-                    });
-                  } else if (idCategoriaParada == 4) {
-                    setState(() {
-                      paradasTipo4.add(paradas);
-                      parCodTipo4.add(paradas.cdParada!);
-                    });
-                  } else if (idCategoriaParada == 5) {
-                    setState(() {
-                      paradasTipo5.add(paradas);
-                      parCodTipo5.add(paradas.cdParada!);
-                    });
-                  } else if (idCategoriaParada == 6) {
-                    setState(() {
-                      paradasTipo6.add(paradas);
-                      parCodTipo6.add(paradas.cdParada!);
-                    });
-                  } else if (idCategoriaParada == 7) {
-                    setState(() {
-                      paradasTipo7.add(paradas);
-                      parCodTipo7.add(paradas.cdParada!);
-                    });
+                  } else {
+                    if (idCategoriaParada == 1) {
+                      setState(() {
+                        paradasTipo1.add(paradas);
+                        parCodTipo1.add(paradas.cdParada!);
+                      });
+                    } else if (idCategoriaParada == 2) {
+                      setState(() {
+                        paradasTipo2.add(paradas);
+                        parCodTipo2.add(paradas.cdParada!);
+                      });
+                    } else if (idCategoriaParada == 3) {
+                      setState(() {
+                        paradasTipo3.add(paradas);
+                        parCodTipo3.add(paradas.cdParada!);
+                      });
+                    } else if (idCategoriaParada == 4) {
+                      setState(() {
+                        paradasTipo4.add(paradas);
+                        parCodTipo4.add(paradas.cdParada!);
+                      });
+                    } else if (idCategoriaParada == 5) {
+                      setState(() {
+                        paradasTipo5.add(paradas);
+                        parCodTipo5.add(paradas.cdParada!);
+                      });
+                    } else if (idCategoriaParada == 6) {
+                      setState(() {
+                        paradasTipo6.add(paradas);
+                        parCodTipo6.add(paradas.cdParada!);
+                      });
+                    } else if (idCategoriaParada == 7) {
+                      setState(() {
+                        paradasTipo7.add(paradas);
+                        parCodTipo7.add(paradas.cdParada!);
+                      });
+                    }
                   }
                 }
-              }
-              paradasPorCategoriaObjects();
-              Navigator.pop(context, 'OK');
-            },
-            child: const Text('OK'),
+                paradasPorCategoriaObjects();
+                Navigator.pop(context, 'Finalizar');
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 25.0, horizontal: 50.0),
+              ),
+              child: const Text('Finalizar'),
+            ),
           ),
         ],
       );
@@ -778,23 +784,29 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              selectedListOfSetores.clear();
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                selectedListOfSetores.clear();
 
-              for (var setor in listOfSetores) {
-                if (setor.check == true) {
-                  setState(() {
-                    selectedListOfSetores.add(
-                      SetoreSelecionados(cdSetor: setor.cdSetor),
-                    );
-                  });
+                for (var setor in listOfSetores) {
+                  if (setor.check == true) {
+                    setState(() {
+                      selectedListOfSetores.add(
+                        SetoreSelecionados(cdSetor: setor.cdSetor),
+                      );
+                    });
+                  }
                 }
-              }
 
-              Navigator.pop(context, 'OK');
-            },
-            child: const Text('OK'),
+                Navigator.pop(context, 'Finalizar');
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 25.0, horizontal: 50.0),
+              ),
+              child: const Text('Finalizar'),
+            ),
           ),
         ],
       );
