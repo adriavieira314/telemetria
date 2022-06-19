@@ -1139,7 +1139,11 @@ class MensagemErro extends StatelessWidget {
           Center(
             child: Text(
               '${mensagemErro.toString()}.  Link servidor: $serverURL',
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 30.0,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -1148,7 +1152,11 @@ class MensagemErro extends StatelessWidget {
             children: [
               const Text(
                 'Vá para menu para alterar o servidor',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               Padding(
