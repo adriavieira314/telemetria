@@ -178,7 +178,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.2,
+              width: 200,
               child: FittedBox(
                 child: Text(
                   _timeString,

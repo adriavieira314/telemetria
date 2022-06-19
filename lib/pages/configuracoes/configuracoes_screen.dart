@@ -261,8 +261,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                       top: 8.0,
                                       bottom: 15.0,
                                     ),
-                                    child: CustomTextWidget(
-                                      texto: 'Selecione o setor:',
+                                    child: Text(
+                                      'Selecione o setor:',
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                   InkWell(
@@ -475,8 +479,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   Column configuracaoTipoParada(BuildContext context) {
     return Column(
       children: [
-        const CustomTextWidget(
-          texto: 'Configuração do Tipo\nde Parada',
+        const Text(
+          'Configuração do Tipo de Parada',
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
@@ -596,13 +602,11 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   SizedBox radioListTile(String title, String value) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.2,
+      width: 300,
       child: ListTile(
-        title: FittedBox(
-          child: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: Transform.scale(
           scale: 1.8,
@@ -996,8 +1000,10 @@ class ConfiguracaoTempoParada extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const CustomTextWidget(
-          texto: 'Configuração do Tempo\nde Parada',
+        const Text(
+          'Configuração do Tempo de Parada',
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
@@ -1049,8 +1055,10 @@ class ConfiguracaoPecasRefugadas extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const CustomTextWidget(
-          texto: 'Configuração de Peças\nRefugadas',
+        const Text(
+          'Configuração de Peças Refugadas',
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
