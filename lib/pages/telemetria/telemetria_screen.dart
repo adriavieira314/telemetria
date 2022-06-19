@@ -21,6 +21,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   dynamic situacoesSetores = [];
   late dynamic cellText;
   late String _timeString;
+  late Timer _timer;
 
   List<Map<String, dynamic>> arrayRows = [];
   Map<String, dynamic> colunas = {};
@@ -32,8 +33,6 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
       ),
     )
   ];
-  List<DataRow> rows = [];
-  List<DataCell> cells = [];
 
   getColor(String maquinaColor) {
     String hex = '0xFF';
@@ -47,7 +46,6 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   void _getTime() {
     final String formattedDateTime =
         DateFormat('dd/MM/yyyy kk:mm:ss').format(DateTime.now()).toString();
-    print(formattedDateTime);
     setState(() {
       _timeString = formattedDateTime;
     });
@@ -58,7 +56,8 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
     super.initState();
     // _timeString = _formatDateTime(DateTime.now());
     _getTime();
-    Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+    _timer =
+        Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
 
     var contador = 0;
 
@@ -155,6 +154,12 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
     }).catchError((onError) {
       print(onError);
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer.cancel();
   }
 
   @override
