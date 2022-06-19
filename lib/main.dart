@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
 import 'package:telemetria/pages/servidor/servidor_screen.dart';
@@ -19,8 +20,21 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    // *botoes de navegação e o status bar do dispositivo somem quando a aplicação está aberta
+    // ignore: deprecated_member_use
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
