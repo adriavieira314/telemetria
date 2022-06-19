@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:telemetria/constants/array_categorias.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen_text.dart';
@@ -17,6 +20,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   bool loadData = false;
   dynamic situacoesSetores = [];
   late dynamic cellText;
+  late String _timeString;
 
   List<Map<String, dynamic>> arrayRows = [];
   Map<String, dynamic> colunas = {};
@@ -24,9 +28,9 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   List<DataColumn> columns = [
     const DataColumn(
       label: HeaderText(
-        text: 'Data e Hora aqui',
+        text: TelemetriaScreenText.empresa,
       ),
-    ),
+    )
   ];
   List<DataRow> rows = [];
   List<DataCell> cells = [];
@@ -40,9 +44,22 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
     return hexColor;
   }
 
+  void _getTime() {
+    final String formattedDateTime =
+        DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()).toString();
+    print(formattedDateTime);
+    setState(() {
+      _timeString = formattedDateTime;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    // _timeString = _formatDateTime(DateTime.now());
+    _getTime();
+    Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+
     var contador = 0;
 
     _telemetriaDao.getTelemetria().then((value) {
@@ -148,10 +165,9 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
         backgroundColor: Colors.black,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            AppBarText(text: TelemetriaScreenText.empresa),
-            AppBarText(text: TelemetriaScreenText.titulo),
-            AppBarText(text: TelemetriaScreenText.logo),
+          children: [
+            AppBarText(text: _timeString.toString()),
+            const AppBarText(text: TelemetriaScreenText.titulo),
           ],
         ),
       ),
