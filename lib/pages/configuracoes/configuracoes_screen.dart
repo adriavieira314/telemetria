@@ -41,6 +41,9 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   final TextEditingController _refugoAmarelo = TextEditingController();
   final TextEditingController _refugoProducao = TextEditingController();
 
+  TextEditingController searchSetoresController = TextEditingController();
+  TextEditingController searchParadasController = TextEditingController();
+
   final SetoresDao _daoSetores = SetoresDao();
   final CategoriasParadasDao _categoriasParadasDao = CategoriasParadasDao();
   final ParadasListDao _paradasListDao = ParadasListDao();
@@ -268,13 +271,17 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                       context: context,
                                       builder: (BuildContext context) =>
                                           _displaySetoresDialog(context),
-                                    ).then((value) => {
-                                          setState(() {
-                                            qtdSetoresSelecionados =
-                                                selectedListOfSetores.length
-                                                    .toString();
-                                          })
-                                        }),
+                                    ).then(
+                                      (value) => {
+                                        setState(() {
+                                          qtdSetoresSelecionados =
+                                              selectedListOfSetores.length
+                                                  .toString();
+
+                                          searchSetoresController.text = "";
+                                        })
+                                      },
+                                    ),
                                     child: TextFormField(
                                       decoration: InputDecoration(
                                         border: const OutlineInputBorder(
@@ -554,6 +561,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                     context: context,
                     builder: (BuildContext context) =>
                         _displayParadasDialog(context),
+                  ).then(
+                    (value) => {
+                      setState(() {
+                        searchParadasController.text = "";
+                      })
+                    },
                   ),
                   child: TextFormField(
                     decoration: const InputDecoration(
@@ -608,35 +621,34 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
         content: SizedBox(
           width: MediaQuery.of(context).size.width * 0.8,
           height: MediaQuery.of(context).size.height * 0.8,
-          child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: listOfParadas.length,
-              itemBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 50,
-                  child: ListTile(
-                    onTap: () {
-                      setState(() {
-                        listOfParadas[index].check =
-                            !listOfParadas[index].check!;
-                      });
-                    },
-                    leading: Transform.scale(
-                      scale: 1.7,
-                      child: Checkbox(
-                        checkColor: Colors.white,
-                        value: listOfParadas[index].check,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            listOfParadas[index].check = value!;
-                          });
-                        },
-                      ),
-                    ),
-                    title: Text(listOfParadas[index].dsParada!),
-                  ),
-                );
-              }),
+          child: SingleChildScrollView(
+            primary: true,
+            child: Column(
+              children: [
+                SizedBox(
+                  child: searchInput(searchParadasController, setState),
+                ),
+                ListView.builder(
+                  primary: false,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: listOfParadas.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (searchParadasController.text.isEmpty) {
+                      return listTileParadas(setState, index);
+                    } else if (listOfParadas[index]
+                        .dsParada!
+                        .toLowerCase()
+                        .contains(searchParadasController.text.toLowerCase())) {
+                      return listTileParadas(setState, index);
+                    }
+
+                    return Container();
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -700,6 +712,32 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     });
   }
 
+  SizedBox listTileParadas(StateSetter setState, int index) {
+    return SizedBox(
+      height: 50,
+      child: ListTile(
+        onTap: () {
+          setState(() {
+            listOfParadas[index].check = !listOfParadas[index].check!;
+          });
+        },
+        leading: Transform.scale(
+          scale: 1.7,
+          child: Checkbox(
+            checkColor: Colors.white,
+            value: listOfParadas[index].check,
+            onChanged: (bool? value) {
+              setState(() {
+                listOfParadas[index].check = value!;
+              });
+            },
+          ),
+        ),
+        title: Text(listOfParadas[index].dsParada!),
+      ),
+    );
+  }
+
   _displaySetoresDialog(BuildContext context) {
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
@@ -710,35 +748,34 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height * 0.8,
-          child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: listOfSetores.length,
-              itemBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 50,
-                  child: ListTile(
-                    onTap: () {
-                      setState(() {
-                        listOfSetores[index].check =
-                            !listOfSetores[index].check!;
-                      });
-                    },
-                    leading: Transform.scale(
-                      scale: 1.7,
-                      child: Checkbox(
-                        checkColor: Colors.white,
-                        value: listOfSetores[index].check,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            listOfSetores[index].check = value!;
-                          });
-                        },
-                      ),
-                    ),
-                    title: Text(listOfSetores[index].dsSetor!),
-                  ),
-                );
-              }),
+          child: SingleChildScrollView(
+            primary: true,
+            child: Column(
+              children: [
+                SizedBox(
+                  child: searchInput(searchSetoresController, setState),
+                ),
+                ListView.builder(
+                  primary: false,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: listOfSetores.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (searchSetoresController.text.isEmpty) {
+                      return listTileSetores(setState, index);
+                    } else if (listOfSetores[index]
+                        .dsSetor!
+                        .toLowerCase()
+                        .contains(searchSetoresController.text.toLowerCase())) {
+                      return listTileSetores(setState, index);
+                    }
+
+                    return Container();
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -762,6 +799,32 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
         ],
       );
     });
+  }
+
+  SizedBox listTileSetores(StateSetter setState, int index) {
+    return SizedBox(
+      height: 50,
+      child: ListTile(
+        onTap: () {
+          setState(() {
+            listOfSetores[index].check = !listOfSetores[index].check!;
+          });
+        },
+        leading: Transform.scale(
+          scale: 1.7,
+          child: Checkbox(
+            checkColor: Colors.white,
+            value: listOfSetores[index].check,
+            onChanged: (bool? value) {
+              setState(() {
+                listOfSetores[index].check = value!;
+              });
+            },
+          ),
+        ),
+        title: Text(listOfSetores[index].dsSetor!),
+      ),
+    );
   }
 
   clearArray() {
@@ -812,6 +875,47 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     objParTipo5 = ParadasPorCategoria(idCatPar: 5, paradas: parCodTipo5);
     objParTipo6 = ParadasPorCategoria(idCatPar: 6, paradas: parCodTipo6);
     objParTipo7 = ParadasPorCategoria(idCatPar: 7, paradas: parCodTipo7);
+  }
+
+  SizedBox searchInput(TextEditingController controller, setState) {
+    return SizedBox(
+      height: 65.0,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: TextField(
+          onChanged: (value) {
+            setState(() {});
+          },
+          controller: controller,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.grey),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.blue, width: 1),
+              borderRadius: BorderRadius.circular(30),
+            ),
+
+            filled: true,
+            fillColor: Colors.white,
+            labelText: "Pesquisa",
+            // hintText: "Filtrar por nome, função ou setor",
+            prefixIcon: const Icon(Icons.search),
+            suffixIcon: InkWell(
+              onTap: () {
+                controller.text = '';
+                setState(() {});
+              },
+              child: const Icon(Icons.close_outlined),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
