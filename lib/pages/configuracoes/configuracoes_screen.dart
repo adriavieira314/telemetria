@@ -261,9 +261,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                       top: 8.0,
                                       bottom: 15.0,
                                     ),
-                                    child: Text(
-                                      'Selecione o setor:',
-                                      style: TextStyle(fontSize: 20.0),
+                                    child: CustomTextWidget(
+                                      texto: 'Selecione o setor:',
                                     ),
                                   ),
                                   InkWell(
@@ -476,10 +475,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   Column configuracaoTipoParada(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          'Configuração do Tipo\nde Parada',
-          style: TextStyle(fontSize: 20.0),
-          textAlign: TextAlign.center,
+        const CustomTextWidget(
+          texto: 'Configuração do Tipo\nde Parada',
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
@@ -546,7 +543,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           (Categorias value) {
                         return DropdownMenuItem<Categorias>(
                           value: value,
-                          child: Text(value.dsCatPar!),
+                          child: Text(
+                            value.dsCatPar!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -576,7 +576,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         ),
                       ),
                       labelText: 'Paradas',
-                      labelStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
                       filled: true,
                       fillColor: Colors.white,
                     ),
@@ -595,9 +596,14 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   SizedBox radioListTile(String title, String value) {
     return SizedBox(
-      width: 300,
+      width: MediaQuery.of(context).size.width * 0.2,
       child: ListTile(
-        title: Text(title),
+        title: FittedBox(
+          child: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
         leading: Transform.scale(
           scale: 1.8,
           child: Radio(
@@ -617,7 +623,25 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   _displayParadasDialog(BuildContext context) {
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
-        title: const Text('Paradas'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Paradas',
+              style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context, 'Finalizar');
+              },
+              icon: const Icon(
+                Icons.cancel_outlined,
+                size: 30.0,
+              ),
+            )
+          ],
+        ),
         content: SizedBox(
           width: MediaQuery.of(context).size.width * 0.8,
           height: MediaQuery.of(context).size.height * 0.8,
@@ -710,7 +734,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                 padding: const EdgeInsets.symmetric(
                     vertical: 25.0, horizontal: 50.0),
               ),
-              child: const Text('Finalizar'),
+              child: const Text(
+                'Finalizar',
+                style: TextStyle(fontSize: 25.0),
+              ),
             ),
           ),
         ],
@@ -739,7 +766,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
             },
           ),
         ),
-        title: Text(listOfParadas[index].dsParada!),
+        title: Text(
+          listOfParadas[index].dsParada!,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -747,9 +777,24 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   _displaySetoresDialog(BuildContext context) {
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
-        title: const Text(
-          'Setores',
-          textAlign: TextAlign.center,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Setores',
+              style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context, 'Finalizar');
+              },
+              icon: const Icon(
+                Icons.cancel_outlined,
+                size: 30.0,
+              ),
+            )
+          ],
         ),
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
@@ -805,7 +850,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                 padding: const EdgeInsets.symmetric(
                     vertical: 25.0, horizontal: 50.0),
               ),
-              child: const Text('Finalizar'),
+              child: const Text(
+                'Finalizar',
+                style: TextStyle(fontSize: 25.0),
+              ),
             ),
           ),
         ],
@@ -834,7 +882,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
             },
           ),
         ),
-        title: Text(listOfSetores[index].dsSetor!),
+        title: Text(
+          listOfSetores[index].dsSetor!,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -893,7 +944,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     return SizedBox(
       height: 65.0,
       child: Padding(
-        padding: const EdgeInsets.only(top: 10.0),
+        padding: const EdgeInsets.only(top: 10.0, left: 15.0, right: 15.0),
         child: TextField(
           onChanged: (value) {
             setState(() {});
@@ -945,10 +996,8 @@ class ConfiguracaoTempoParada extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          'Configuração do Tempo\nde Parada',
-          style: TextStyle(fontSize: 20.0),
-          textAlign: TextAlign.center,
+        const CustomTextWidget(
+          texto: 'Configuração do Tempo\nde Parada',
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
@@ -1000,10 +1049,8 @@ class ConfiguracaoPecasRefugadas extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          'Configuração de Peças\nRefugadas',
-          style: TextStyle(fontSize: 20.0),
-          textAlign: TextAlign.center,
+        const CustomTextWidget(
+          texto: 'Configuração de Peças\nRefugadas',
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
@@ -1059,6 +1106,7 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
       decoration: InputDecoration(
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(
@@ -1066,7 +1114,8 @@ class CustomTextFormField extends StatelessWidget {
           ),
         ),
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.black),
+        labelStyle:
+            const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: 'Em segundos',
         filled: true,
@@ -1207,6 +1256,25 @@ class Configuracao extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomTextWidget extends StatelessWidget {
+  final String texto;
+  const CustomTextWidget({Key? key, required this.texto}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.2,
+      child: FittedBox(
+        child: Text(
+          texto,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         ),
       ),
     );
