@@ -389,6 +389,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                     .then((value) {
                                   print('sucesso');
                                   print(value);
+                                  prefs.setBool('telaConfigurada', true);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute<void>(
