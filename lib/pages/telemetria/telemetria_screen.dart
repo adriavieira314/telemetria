@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:telemetria/constants/array_categorias.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
@@ -160,12 +161,24 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
     }).catchError((onError) {
       print(onError);
     });
+
+    // orientação landscape somente
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
   }
 
   @override
   void dispose() {
-    super.dispose();
     _timer.cancel();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
   }
 
   @override
