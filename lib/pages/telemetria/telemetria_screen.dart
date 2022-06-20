@@ -213,6 +213,12 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // orientação landscape somente
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
