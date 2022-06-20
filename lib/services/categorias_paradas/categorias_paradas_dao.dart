@@ -16,15 +16,16 @@ class CategoriasParadasDao {
     );
 
     if (response.statusCode == 200) {
-      print('response.body telemetria');
+      print('response.body  CategoriasParadas');
       // print(response.body);
 
       return CategoriasParadas.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      print('error ao receber telemetria');
+      print('error ao receber CategoriasParadas');
       print(response.body);
-      throw Exception('Erro ao receber dados da Telemetria. ${response.body}');
+      throw Exception(
+          'Erro ao receber dados da  CategoriasParadas. ${response.body}');
     }
   }
 }

@@ -16,14 +16,14 @@ class ParadasListDao {
     );
 
     if (response.statusCode == 200) {
-      print('response.body telemetria');
+      print('response.body ParadasList');
       // print(response.body);
 
       return ParadasList.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      print('error ao receber telemetria');
+      print('error ao receber ParadasList');
       print(response.body);
-      throw Exception('Erro ao receber dados da Telemetria. ${response.body}');
+      throw Exception('Erro ao receber dados da ParadasList. ${response.body}');
     }
   }
 }
