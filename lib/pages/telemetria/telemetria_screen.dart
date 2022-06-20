@@ -241,6 +241,22 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
         ),
         actions: [
           Padding(
+            padding: const EdgeInsets.only(left: 18.0),
+            child: Material(
+              color: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: InkWell(
+                onTap: (() => RestartWidget.restartApp(context)),
+                child: const Icon(
+                  Icons.refresh,
+                  size: 30.0,
+                ),
+              ),
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.only(right: 18.0, left: 25.0),
             child: PopupMenuButton(
               itemBuilder: (context) => [
