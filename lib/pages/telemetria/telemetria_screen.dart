@@ -11,7 +11,9 @@ import 'package:telemetria/pages/telemetria/telemetria_screen_text.dart';
 import 'package:telemetria/services/telemetriaDao/telemetria_dao.dart';
 import 'package:telemetria/utils/constants.dart';
 
-late Timer _timer;
+late Timer _timerRelogio;
+late Timer _timerAtualizacao;
+bool voltarConfig = false;
 
 class TelemetriaScreen extends StatefulWidget {
   const TelemetriaScreen({Key? key}) : super(key: key);
@@ -50,20 +52,15 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
 
   void _getTime() {
     final String formattedDateTime =
-        DateFormat('dd/MM/yyyy kk:mm:ss').format(DateTime.now()).toString();
-    setState(() {
-      _timeString = formattedDateTime;
-    });
+        DateFormat('dd/MM/yyyy - kk:mm').format(DateTime.now()).toString();
+    if (mounted) {
+      setState(() {
+        _timeString = formattedDateTime;
+      });
+    }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // _timeString = _formatDateTime(DateTime.now());
-    _getTime();
-    _timer =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
-
+  void _getTelemetria() {
     var contador = 0;
 
     _telemetriaDao.getTelemetria().then((value) {
@@ -165,17 +162,46 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
     }).catchError((onError) {
       print(onError);
     });
+  }
+
+  void timersFunction() {
+    _timerRelogio =
+        Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+
+    // *timer de atualização da tela
+    _timerAtualizacao = Timer.periodic(
+      Duration(seconds: atualizacaoTempo),
+      (Timer t) {
+        if (mounted) {
+          RestartWidget.restartApp(context);
+          // orientação landscape somente
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeRight,
+            DeviceOrientation.landscapeLeft,
+          ]);
+        }
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    _getTime();
+    _getTelemetria();
+    timersFunction();
 
     // orientação landscape somente
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+
+    super.initState();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timerRelogio.cancel();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
@@ -227,7 +253,12 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                           ),
                           content: LoginTecnico(),
                         ),
-                      ),
+                      ).then((value) {
+                        print('hi there');
+                        if (voltarConfig == false) {
+                          timersFunction();
+                        }
+                      }),
                     )
                   },
                   child: const Text(
@@ -248,9 +279,12 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          content: tempoAtualizacao(),
+                          content: TempoAtualizacao(),
                         ),
-                      ),
+                      ).then((value) {
+                        print('hi there');
+                        timersFunction();
+                      }),
                     )
                   },
                   child: const Text('Tempo de Atualização'),
@@ -341,6 +375,11 @@ class _LoginTecnicoState extends State<LoginTecnico> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextFormField(
+                onTap: () {
+                  _timerAtualizacao.cancel();
+                  _timerRelogio.cancel();
+                  print('hello');
+                },
                 decoration: const InputDecoration(
                   labelText: 'Técnico',
                 ),
@@ -358,7 +397,11 @@ class _LoginTecnicoState extends State<LoginTecnico> {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: TextFormField(
                   obscureText: _isObscure,
-                  onTap: () {},
+                  onTap: () {
+                    _timerAtualizacao.cancel();
+                    _timerRelogio.cancel();
+                    print('hello');
+                  },
                   decoration: InputDecoration(
                     labelText: 'Senha',
                     suffixIcon: IconButton(
@@ -388,14 +431,19 @@ class _LoginTecnicoState extends State<LoginTecnico> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // fecho o modal
                       Navigator.pop(context);
-                      _timer.cancel();
-                      SystemChrome.setPreferredOrientations([
-                        DeviceOrientation.landscapeRight,
-                        DeviceOrientation.landscapeLeft,
-                        DeviceOrientation.portraitUp,
-                        DeviceOrientation.portraitDown,
-                      ]);
+                      // paradando o timer
+                      _timerRelogio.cancel();
+                      _timerAtualizacao.cancel();
+
+                      setState(() {
+                        voltarConfig = true;
+                      });
+
+                      // novo valor do prefs telaConfigurada
+                      prefs.setBool('telaConfigurada', false);
+                      // volto para tela de configuracao
                       Navigator.push(
                         context,
                         MaterialPageRoute<void>(
@@ -425,12 +473,12 @@ class _LoginTecnicoState extends State<LoginTecnico> {
   }
 }
 
-class tempoAtualizacao extends StatelessWidget {
-  const tempoAtualizacao({Key? key}) : super(key: key);
+class TempoAtualizacao extends StatelessWidget {
+  const TempoAtualizacao({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     final TextEditingController tempoController = TextEditingController();
 
     prefs.getString('tempoAtualizacao') != null
@@ -441,11 +489,16 @@ class tempoAtualizacao extends StatelessWidget {
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.3,
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               TextFormField(
+                onTap: () {
+                  _timerAtualizacao.cancel();
+                  _timerRelogio.cancel();
+                  print('hello');
+                },
                 decoration: const InputDecoration(
                   labelText: 'Tempo de atualização',
                   hintText: 'Em segundos',
@@ -463,8 +516,8 @@ class tempoAtualizacao extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      prefs.setString('tempo', tempoController.text);
+                    if (formKey.currentState!.validate()) {
+                      prefs.setString('tempoAtualizacao', tempoController.text);
                       tempoDePaginacao();
                       Navigator.pop(context);
                       RestartWidget.restartApp(context);

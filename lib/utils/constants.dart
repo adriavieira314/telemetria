@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 String serverURL = '';
 Exception mensagemErro = Exception();
 int tempoDeEspera = 30;
-int tempoAtualizacao = 15;
+int atualizacaoTempo = 15;
 
 void getServer() async {
   final prefs = await SharedPreferences.getInstance();
@@ -26,8 +26,8 @@ void tempoDePaginacao() async {
   final prefs = await SharedPreferences.getInstance();
 
   if (prefs.getString('tempoAtualizacao') == null) {
-    tempoAtualizacao = 15;
+    atualizacaoTempo = 15;
   } else {
-    tempoAtualizacao = int.parse(prefs.getString('tempoAtualizacao')!);
+    atualizacaoTempo = int.parse(prefs.getString('tempoAtualizacao')!);
   }
 }

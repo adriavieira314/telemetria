@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:telemetria/main.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
-import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
 import 'package:telemetria/utils/constants.dart';
 
 class ServidorScreen extends StatefulWidget {

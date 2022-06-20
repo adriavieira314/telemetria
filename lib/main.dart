@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
 import 'package:telemetria/pages/servidor/servidor_screen.dart';
+import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 import 'package:telemetria/utils/constants.dart';
 
 late SharedPreferences prefs;
@@ -12,6 +13,7 @@ void main() async {
   prefs = await SharedPreferences.getInstance();
   // prefs.remove('server');
   getServer();
+  tempoDePaginacao();
 
   runApp(
     const RestartWidget(
@@ -45,8 +47,9 @@ class _MyAppState extends State<MyApp> {
       ),
       home: prefs.getString('server') == null
           ? const ServidorScreen()
-          : const ConfiguracoesScreen(),
-      // home: const ServidorScreen(),
+          : prefs.getBool('telaConfigurada') == true
+              ? const TelemetriaScreen()
+              : const ConfiguracoesScreen(),
     );
   }
 }
