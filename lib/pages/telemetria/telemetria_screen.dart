@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:telemetria/constants/array_categorias.dart';
+import 'package:telemetria/main.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
+import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen_text.dart';
 import 'package:telemetria/services/telemetriaDao/telemetria_dao.dart';
+import 'package:telemetria/utils/constants.dart';
+
+late Timer _timer;
 
 class TelemetriaScreen extends StatefulWidget {
   const TelemetriaScreen({Key? key}) : super(key: key);
@@ -22,7 +27,6 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   dynamic situacoesSetores = [];
   late dynamic cellText;
   late String _timeString;
-  late Timer _timer;
 
   List<Map<String, dynamic>> arrayRows = [];
   Map<String, dynamic> colunas = {};
@@ -186,6 +190,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -199,10 +204,61 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                 ),
               ),
             ),
-            // AppBarText(text: _timeString.toString()),
             const AppBarText(text: TelemetriaScreenText.titulo),
           ],
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 18.0, left: 25.0),
+            child: PopupMenuButton(
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 1,
+                  onTap: () => {
+                    Future.delayed(
+                      const Duration(seconds: 0),
+                      () => showDialog(
+                        context: context,
+                        builder: (context) => const AlertDialog(
+                          title: Text(
+                            'Inserir Técnico',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: LoginTecnico(),
+                        ),
+                      ),
+                    )
+                  },
+                  child: const Text(
+                    'Tela Configuração',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 2,
+                  onTap: () => {
+                    Future.delayed(
+                      const Duration(seconds: 0),
+                      () => showDialog(
+                        context: context,
+                        builder: (context) => const AlertDialog(
+                          title: Text(
+                            'Tempo da Paginação',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: tempoAtualizacao(),
+                        ),
+                      ),
+                    )
+                  },
+                  child: const Text('Tempo de Atualização'),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -257,6 +313,179 @@ class HeaderText extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class LoginTecnico extends StatefulWidget {
+  const LoginTecnico({Key? key}) : super(key: key);
+
+  @override
+  State<LoginTecnico> createState() => _LoginTecnicoState();
+}
+
+class _LoginTecnicoState extends State<LoginTecnico> {
+  bool _isObscure = true;
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController userController = TextEditingController();
+  final TextEditingController senhaController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: 250.0,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Técnico',
+                ),
+                controller: userController,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira o técnico';
+                  } else if (userController.text.toLowerCase() != "admin") {
+                    return 'Técnico incorreto';
+                  }
+                  return null;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: TextFormField(
+                  obscureText: _isObscure,
+                  onTap: () {},
+                  decoration: InputDecoration(
+                    labelText: 'Senha',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                          _isObscure ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
+                    ),
+                  ),
+                  controller: senhaController,
+                  keyboardType: TextInputType.number,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira a senha';
+                    } else if (senhaController.text != "12345") {
+                      return 'Senha incorreta';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      Navigator.pop(context);
+                      _timer.cancel();
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeRight,
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const ConfiguracoesScreen(),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 25.0),
+                    elevation: 5,
+                  ),
+                  child: const Text(
+                    'Finalizar',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class tempoAtualizacao extends StatelessWidget {
+  const tempoAtualizacao({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController tempoController = TextEditingController();
+
+    prefs.getString('tempoAtualizacao') != null
+        ? tempoController.text = prefs.getString('tempoAtualizacao')!
+        : tempoController.text = "";
+
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.3,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Tempo de atualização',
+                  hintText: 'Em segundos',
+                ),
+                controller: tempoController,
+                keyboardType: TextInputType.number,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, escolha um tempo';
+                  }
+                  return null;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      prefs.setString('tempo', tempoController.text);
+                      tempoDePaginacao();
+                      Navigator.pop(context);
+                      RestartWidget.restartApp(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 25.0),
+                    elevation: 5,
+                  ),
+                  child: const Text(
+                    'Finalizar',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
