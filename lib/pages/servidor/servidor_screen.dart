@@ -26,9 +26,8 @@ class _ServidorScreenState extends State<ServidorScreen> {
         backgroundColor: Colors.black,
         elevation: 0,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            AppBarText(text: ConfiguracoesScreenText.empresa),
             AppBarText(text: 'TELEMETRIA'),
           ],
         ),
@@ -40,7 +39,7 @@ class _ServidorScreenState extends State<ServidorScreen> {
             hasScrollBody: false,
             child: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.5,
+                width: MediaQuery.of(context).size.width * 0.6,
                 height: MediaQuery.of(context).size.height * 0.5,
                 decoration: const BoxDecoration(
                   color: Colors.white,

@@ -1155,8 +1155,8 @@ class MensagemErro extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
             children: [
               const Text(
                 'Vá para menu para alterar o servidor',
@@ -1168,7 +1168,7 @@ class MensagemErro extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                 child: Container(
                   width: 40.0,
                   height: 40.0,
