@@ -206,7 +206,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(left: 18.0),
+            padding: const EdgeInsets.only(right: 18.0),
             child: Material(
               color: Colors.transparent,
               shape: RoundedRectangleBorder(
