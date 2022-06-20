@@ -2,7 +2,7 @@
     package="com.example.telemetria">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="telemetria"
+        android:label="Telemetria"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
