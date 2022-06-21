@@ -160,7 +160,12 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
         loadData = true;
         erroNaChamada = false;
       });
+      // inicia timer de atualizacao
+      timersFunction();
     }).catchError((onError) {
+      _timerRelogio =
+          Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+
       if (mounted) {
         setState(() {
           loadData = false;
@@ -195,7 +200,6 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   void initState() {
     _getTime();
     _getTelemetria();
-    timersFunction();
 
     // orientação landscape somente
     SystemChrome.setPreferredOrientations([
