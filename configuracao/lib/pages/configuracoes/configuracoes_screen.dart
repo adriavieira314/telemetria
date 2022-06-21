@@ -416,18 +416,20 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                     isResponseLoading = false;
                                   });
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      backgroundColor: Colors.red,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 25.0),
-                                      behavior: SnackBarBehavior.floating,
-                                      content: Text(
-                                        onError,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18.0),
-                                        textAlign: TextAlign.center,
+                                  Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () => showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text(
+                                          'Alerta',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        content: ErroSaveConfiguracao(
+                                          errorMessage: onError,
+                                        ),
                                       ),
                                     ),
                                   );
@@ -1343,6 +1345,50 @@ class CustomTextWidget extends StatelessWidget {
           texto,
           style: const TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+class ErroSaveConfiguracao extends StatelessWidget {
+  final Exception errorMessage;
+  const ErroSaveConfiguracao({Key? key, required this.errorMessage})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: 250.0,
+        // width: MediaQuery.of(context).size.width * 0.6,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              errorMessage.toString(),
+              style:
+                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 25.0),
+                  elevation: 5,
+                ),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
