@@ -6,7 +6,6 @@ import 'package:telemetria/models/paradas.dart';
 import 'package:telemetria/models/setores.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
 import 'package:telemetria/pages/configuracoes/configuracoes_screen_text.dart';
-import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 import 'package:telemetria/services/categorias_paradas/categorias_paradas_dao.dart';
 import 'package:telemetria/services/configuracoes/configuracoes_dao.dart';
 import 'package:telemetria/services/configuracoes_salvas/configuracoes_salvas_dao.dart';
@@ -34,6 +33,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   bool showGraph = false;
   bool erroNaChamada = false;
   String qtdSetoresSelecionados = '';
+  bool isResponseLoading = false;
 
   final TextEditingController _tempoBranco = TextEditingController();
   final TextEditingController _tempoAmarelo = TextEditingController();
@@ -360,6 +360,10 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                 const EdgeInsets.only(top: 25.0, bottom: 25.0),
                             child: ElevatedButton(
                               onPressed: () {
+                                setState(() {
+                                  isResponseLoading = true;
+                                });
+
                                 var configuracoesJson = Configuracoes(
                                   setoreSelecionados: selectedListOfSetores,
                                   paradasPorCategoria: [
@@ -389,16 +393,40 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                     .then((value) {
                                   print('sucesso');
                                   print(value);
-                                  prefs.setBool('telaConfigurada', true);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (BuildContext context) =>
-                                          const TelemetriaScreen(),
+                                  setState(() {
+                                    isResponseLoading = false;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      backgroundColor: Color(0xFF198754),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 25.0),
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text(
+                                        'Sucesso ao configurar a Telemetria!',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0),
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   );
                                 }).catchError((onError) {
-                                  print(onError);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: const Color(0xFF198754),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 25.0),
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text(
+                                        onError,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  );
                                 });
                               },
                               style: ElevatedButton.styleFrom(
@@ -409,13 +437,16 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                     vertical: 25.0, horizontal: 70.0),
                                 elevation: 5,
                               ),
-                              child: const Text(
-                                'Concluir',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20.0,
-                                ),
-                              ),
+                              child: isResponseLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : const Text(
+                                      'Concluir',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20.0,
+                                      ),
+                                    ),
                             ),
                           ),
                         ],
