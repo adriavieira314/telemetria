@@ -6,7 +6,8 @@ import 'package:telemetria/utils/constants.dart';
 
 class ConfiguracoesDao {
   Future<http.Response> saveConfiguracoes(Configuracoes jsonBody) async {
-    final response = await http.post(
+    final response = await http
+        .post(
       Uri.parse(
         '$serverURL/idw/rest/injet/monitorizacao/pam/telemetria/configuracoes/salvar',
       ),
@@ -14,6 +15,15 @@ class ConfiguracoesDao {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(jsonBody),
+    )
+        .timeout(
+      Duration(seconds: tempoDeEspera),
+      onTimeout: () {
+        return http.Response(
+          'Tempo de espera de resposta da URL excedeu',
+          408,
+        ); // Request Timeout response status code
+      },
     );
 
     if (response.statusCode == 200) {

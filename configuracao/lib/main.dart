@@ -12,7 +12,6 @@ void main() async {
   prefs = await SharedPreferences.getInstance();
   // prefs.remove('server');
   getServer();
-  tempoDePaginacao();
 
   runApp(
     const RestartWidget(

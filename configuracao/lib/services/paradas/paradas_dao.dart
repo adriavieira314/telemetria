@@ -13,6 +13,14 @@ class ParadasListDao {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
+    ).timeout(
+      Duration(seconds: tempoDeEspera),
+      onTimeout: () {
+        return http.Response(
+          'Tempo de espera de resposta da URL excedeu',
+          408,
+        ); // Request Timeout response status code
+      },
     );
 
     if (response.statusCode == 200) {
