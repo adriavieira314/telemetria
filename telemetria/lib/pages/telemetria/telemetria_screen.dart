@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:telemetria/constants/array_categorias.dart';
 import 'package:telemetria/main.dart';
 import 'package:telemetria/pages/components/appbar_text.dart';
-import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen_text.dart';
 import 'package:telemetria/services/telemetriaDao/telemetria_dao.dart';
 import 'package:telemetria/utils/constants.dart';
@@ -29,6 +28,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   dynamic situacoesSetores = [];
   late dynamic cellText;
   late String _timeString;
+  bool erroNaChamada = false;
 
   List<Map<String, dynamic>> arrayRows = [];
   Map<String, dynamic> colunas = {};
@@ -158,9 +158,16 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
 
       setState(() {
         loadData = true;
+        erroNaChamada = false;
       });
     }).catchError((onError) {
-      print(onError);
+      if (mounted) {
+        setState(() {
+          loadData = false;
+          erroNaChamada = true;
+        });
+        mensagemErro = onError;
+      }
     });
   }
 
@@ -261,6 +268,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
             child: PopupMenuButton(
               itemBuilder: (context) => [
                 PopupMenuItem(
+                  enabled: erroNaChamada,
                   value: 1,
                   onTap: () => {
                     Future.delayed(
@@ -275,17 +283,13 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
                           ),
                           content: LoginTecnico(),
                         ),
-                      ).then((value) {
-                        print('hi there');
-                        if (voltarConfig == false) {
-                          timersFunction();
-                        }
-                      }),
+                      ),
                     )
                   },
-                  child: const Text(
-                    'Tela Configuração',
-                    style: TextStyle(color: Colors.black),
+                  child: Text(
+                    'Configuração',
+                    style: TextStyle(
+                        color: erroNaChamada ? Colors.black : Colors.white),
                   ),
                 ),
                 PopupMenuItem(
@@ -319,33 +323,35 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: loadData
-            ? Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.grey),
-                child: DataTable(
-                  horizontalMargin: 0,
-                  columnSpacing: 10,
-                  dataRowHeight: (MediaQuery.of(context).size.height -
-                          AppBar().preferredSize.height -
-                          headingRowHeight) /
-                      arrayCategorias.length,
-                  headingRowHeight: headingRowHeight,
-                  border: TableBorder.all(
-                    width: 1,
-                    color: Colors.white,
+        child: erroNaChamada
+            ? const MensagemErro()
+            : loadData
+                ? Theme(
+                    data: Theme.of(context).copyWith(dividerColor: Colors.grey),
+                    child: DataTable(
+                      horizontalMargin: 0,
+                      columnSpacing: 10,
+                      dataRowHeight: (MediaQuery.of(context).size.height -
+                              AppBar().preferredSize.height -
+                              headingRowHeight) /
+                          arrayCategorias.length,
+                      headingRowHeight: headingRowHeight,
+                      border: TableBorder.all(
+                        width: 1,
+                        color: Colors.white,
+                      ),
+                      columns: columns,
+                      rows: arrayRows.map((row) {
+                        return DataRow(
+                            cells: row.values.map((cellValue) {
+                          return DataCell(cellValue);
+                        }).toList());
+                      }).toList(),
+                    ),
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(),
                   ),
-                  columns: columns,
-                  rows: arrayRows.map((row) {
-                    return DataRow(
-                        cells: row.values.map((cellValue) {
-                      return DataCell(cellValue);
-                    }).toList());
-                  }).toList(),
-                ),
-              )
-            : const Center(
-                child: CircularProgressIndicator(),
-              ),
       ),
     );
   }
@@ -459,20 +465,107 @@ class _LoginTecnicoState extends State<LoginTecnico> {
                       _timerRelogio.cancel();
                       _timerAtualizacao.cancel();
 
-                      setState(() {
-                        voltarConfig = true;
-                      });
-
-                      // novo valor do prefs telaConfigurada
-                      prefs.setBool('telaConfigurada', false);
-                      // volto para tela de configuracao
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) =>
-                              const ConfiguracoesScreen(),
+                      Future.delayed(
+                        const Duration(seconds: 0),
+                        () => showDialog(
+                          context: context,
+                          builder: (context) => const AlertDialog(
+                            title: Text(
+                              'Configurar Servidor',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            content: Configuracao(),
+                          ),
                         ),
                       );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 25.0),
+                    elevation: 5,
+                  ),
+                  child: const Text(
+                    'Finalizar',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Configuracao extends StatelessWidget {
+  const Configuracao({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final TextEditingController serverController = TextEditingController();
+    final TextEditingController portController = TextEditingController();
+
+    prefs.getString('server') != null
+        ? serverController.text = prefs.getString('server')!
+        : serverController.text = "";
+
+    prefs.getString('port') != null
+        ? portController.text = prefs.getString('port')!
+        : portController.text = "";
+
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: 250.0,
+        width: MediaQuery.of(context).size.width * 0.5,
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Servidor',
+                ),
+                controller: serverController,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira o servidor';
+                  }
+                  return null;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: TextFormField(
+                  onTap: () {},
+                  decoration: const InputDecoration(
+                    labelText: 'Porta',
+                  ),
+                  controller: portController,
+                  keyboardType: TextInputType.number,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira a porta';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      prefs.setString('server', serverController.text);
+                      prefs.setString('port', portController.text);
+                      getServer();
+                      Navigator.pop(context);
+                      RestartWidget.restartApp(context);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -560,6 +653,63 @@ class TempoAtualizacao extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class MensagemErro extends StatelessWidget {
+  const MensagemErro({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: Text(
+              '${mensagemErro.toString()}.  Link servidor: $serverURL',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 30.0,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              const Text(
+                'Vá para menu para alterar o servidor',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Container(
+                  width: 40.0,
+                  height: 40.0,
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                    size: 32.0,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
       ),
     );
   }

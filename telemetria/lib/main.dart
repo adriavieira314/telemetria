@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:telemetria/pages/configuracoes/configuracoes_screen.dart';
 import 'package:telemetria/pages/servidor/servidor_screen.dart';
 import 'package:telemetria/pages/telemetria/telemetria_screen.dart';
 import 'package:telemetria/utils/constants.dart';
@@ -47,9 +46,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: prefs.getString('server') == null
           ? const ServidorScreen()
-          : prefs.getBool('telaConfigurada') == true
-              ? const TelemetriaScreen()
-              : const ConfiguracoesScreen(),
+          : const TelemetriaScreen(),
     );
   }
 }
