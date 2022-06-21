@@ -412,9 +412,13 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                     ),
                                   );
                                 }).catchError((onError) {
+                                  setState(() {
+                                    isResponseLoading = false;
+                                  });
+
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      backgroundColor: const Color(0xFF198754),
+                                      backgroundColor: Colors.red,
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 25.0),
                                       behavior: SnackBarBehavior.floating,
