@@ -7,16 +7,16 @@ class ArrayCategorias {
 
 final arrayCategorias = [
   ArrayCategorias(0, 'FORA CICLO'),
-  ArrayCategorias(1, 'PARADA AGUARDANDO TECNICO'),
-  ArrayCategorias(2, 'PARADA REINICIO FIM SEMANA FERIADO'),
-  ArrayCategorias(3, 'PARADA MANUTENCAO'),
-  ArrayCategorias(4, 'PARADA LIGACAO PERIFERICOS'),
-  ArrayCategorias(5, 'PARADA FERRAMENTARIA'),
-  ArrayCategorias(6, 'PARADA TROCA MOLDE'),
-  ArrayCategorias(7, 'PARADA MATERIA PRIMA'),
-  ArrayCategorias(8, 'PARADA OUTROS MOTIVOS'),
+  ArrayCategorias(1, 'AGUARDANDO TECNICO'),
+  ArrayCategorias(2, 'REINICIO FIM SEMANA FERIADO'),
+  ArrayCategorias(3, 'MANUTENCAO'),
+  ArrayCategorias(4, 'LIGACAO PERIFERICOS'),
+  ArrayCategorias(5, 'FERRAMENTARIA'),
+  ArrayCategorias(6, 'TROCA MOLDE'),
+  ArrayCategorias(7, 'MATERIA PRIMA'),
+  ArrayCategorias(8, 'OUTROS MOTIVOS'),
   ArrayCategorias(9, 'ALARME REFUGO'),
-  ArrayCategorias(10, 'PARADA SEM PROGRAMA'),
+  ArrayCategorias(10, 'SEM PROGRAMA'),
 ];
 
 class Exemplo {

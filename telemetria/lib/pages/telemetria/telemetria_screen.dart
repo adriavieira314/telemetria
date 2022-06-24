@@ -52,7 +52,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
 
   void _getTime() {
     final String formattedDateTime =
-        DateFormat('dd/MM/yyyy - kk:mm').format(DateTime.now()).toString();
+        DateFormat('dd/MM/yyyy\nkk:mm').format(DateTime.now()).toString();
     if (mounted) {
       setState(() {
         _timeString = formattedDateTime;
@@ -96,10 +96,12 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
             if (situacoes[i].idSituacao ==
                 arrayCategorias[arrayCat].idCategoria) {
               // adicionando ao objeto colunas um item categoria
-              colunas['categoria'] = Text(
-                arrayCategorias[arrayCat].descricao,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+              colunas['categoria'] = Center(
+                child: Text(
+                  arrayCategorias[arrayCat].descricao,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               );
 
               // adicionando ao objeto colunas a quantidade de celulas dinamicamente
@@ -160,12 +162,7 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
         loadData = true;
         erroNaChamada = false;
       });
-      // inicia timer de atualizacao
-      timersFunction();
     }).catchError((onError) {
-      _timerRelogio =
-          Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
-
       if (mounted) {
         setState(() {
           loadData = false;
@@ -200,6 +197,8 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
   void initState() {
     _getTime();
     _getTelemetria();
+    // inicia timer de atualizacao
+    timersFunction();
 
     // orientação landscape somente
     SystemChrome.setPreferredOrientations([
@@ -235,20 +234,24 @@ class _TelemetriaScreenState extends State<TelemetriaScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: 200,
-              child: FittedBox(
+        title: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.65,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Center(
                 child: Text(
-                  _timeString,
-                  style: const TextStyle(color: Colors.red),
+                  _timeString.toString(),
+                  style: const TextStyle(
+                      fontSize: 20.0, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-            const AppBarText(text: TelemetriaScreenText.titulo),
-          ],
+              const Center(
+                child: AppBarText(text: TelemetriaScreenText.titulo),
+              ),
+            ],
+          ),
         ),
         actions: [
           Padding(
